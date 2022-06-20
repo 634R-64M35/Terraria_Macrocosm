@@ -1791,7 +1791,7 @@ namespace Macrocosm {
                 Main.player[p.owner].itemAnimation = 10;
                 Main.player[p.owner].itemTime = 10;
             }
-            AIFlail(p, ref ai, Main.player[p.owner].Center, Main.player[p.owner].velocity, Main.player[p.owner].meleeSpeed, Main.player[p.owner].channel, noKill, chainDistance);
+            AIFlail(p, ref ai, Main.player[p.owner].Center, Main.player[p.owner].velocity, Main.player[p.owner].GetAttackSpeed(DamageClass.Melee), Main.player[p.owner].channel, noKill, chainDistance);
             Main.player[p.owner].direction = p.direction;
         }
 
@@ -1901,8 +1901,7 @@ namespace Macrocosm {
 		 * 
 		 * 
 		 */
-		public static bool StickToTiles(Vector2 position, ref Vector2 velocity, int width, int height, Func<int, int, bool> CanStick = null)
-		{
+		public static bool StickToTiles(Vector2 position, ref Vector2 velocity, int width, int height, Func<int, int, bool> CanStick = null) {
 			int tileLeftX = (int)(position.X / 16f) - 1;
 			int tileRightX = (int)((position.X + (float)width) / 16f) + 2;
 			int tileLeftY = (int)(position.Y / 16f) - 1;
@@ -1910,15 +1909,11 @@ namespace Macrocosm {
 			if (tileLeftX < 0) { tileLeftX = 0; } if (tileRightX > Main.maxTilesX) { tileRightX = Main.maxTilesX; }
 			if (tileLeftY < 0) { tileLeftY = 0; } if (tileRightY > Main.maxTilesY) { tileRightY = Main.maxTilesY; }
 			bool stick = false;
-			for (int x = tileLeftX; x < tileRightX; x++)
-			{
-				for (int y = tileLeftY; y < tileRightY; y++)
-				{
-					if (Main.tile[x, y] != null && Main.tile[x, y].nactive() && (CanStick != null ? CanStick(x, y) : (Main.tileSolid[(int)Main.tile[x, y].type] || (Main.tileSolidTop[(int)Main.tile[x, y].type] && Main.tile[x, y].frameY == 0))))
-					{
+			for (int x = tileLeftX; x < tileRightX; x++) {
+				for (int y = tileLeftY; y < tileRightY; y++) {
+					if (Main.tile[x, y] != null && Main.tile[x, y].HasUnactuatedTile && (CanStick != null ? CanStick(x, y) : (Main.tileSolid[(int)Main.tile[x, y].TileType] || (Main.tileSolidTop[(int)Main.tile[x, y].TileType] && Main.tile[x, y].TileFrameY == 0)))) {
 						Vector2 pos = new Vector2((float)(x * 16), (float)(y * 16));
-						if (position.X + (float)width - 4f > pos.X && position.X + 4f < pos.X + 16f && position.Y + (float)height - 4f > pos.Y && position.Y + 4f < pos.Y + 16f)
-						{
+						if (position.X + (float)width - 4f > pos.X && position.X + 4f < pos.X + 16f && position.Y + (float)height - 4f > pos.Y && position.Y + 4f < pos.Y + 16f) {
 							stick = true; velocity *= 0f; break;
 						}
 					}
@@ -1927,8 +1922,6 @@ namespace Macrocosm {
 			}
 			return stick;
 		}
-
-
 		#endregion
 
 		#region Vanilla NPC AI Copy Methods
@@ -1939,19 +1932,14 @@ namespace Macrocosm {
 		 * speedupOverTime: Wether or not to speed up when aligned to the player over time.
 		 * distanceBeforeTakeoff: The distance from the target player before the NPC turns around.
 		 */		
-		public static void AIShadowflameGhost(NPC npc, ref float[] ai, bool speedupOverTime = false, float distanceBeforeTakeoff = 660f, float velIntervalX = 0.3f, float velMaxX = 7f, float velIntervalY = 0.2f, float velMaxY = 4f, float velScalarY = 4f, float velScalarYMax = 15f, float velIntervalXTurn = 0.4f, float velIntervalYTurn = 0.4f, float velIntervalScalar = 0.95f, float velIntervalMaxTurn = 5f)
-		{
+		public static void AIShadowflameGhost(NPC npc, ref float[] ai, bool speedupOverTime = false, float distanceBeforeTakeoff = 660f, float velIntervalX = 0.3f, float velMaxX = 7f, float velIntervalY = 0.2f, float velMaxY = 4f, float velScalarY = 4f, float velScalarYMax = 15f, float velIntervalXTurn = 0.4f, float velIntervalYTurn = 0.4f, float velIntervalScalar = 0.95f, float velIntervalMaxTurn = 5f) {
 			int npcAvoidCollision;
-			for (int m = 0; m < 200; m = npcAvoidCollision + 1)
-			{
-				if (m != npc.whoAmI && Main.npc[m].active && Main.npc[m].type == npc.type)
-				{
+			for (int m = 0; m < 200; m = npcAvoidCollision + 1) {
+				if (m != npc.whoAmI && Main.npc[m].active && Main.npc[m].type == npc.type) {
 					Vector2 dist = Main.npc[m].Center - npc.Center;
-					if (dist.Length() < 50f)
-					{
+					if (dist.Length() < 50f) {
 						dist.Normalize();
-						if (dist.X == 0f && dist.Y == 0f)
-						{
+						if (dist.X == 0f && dist.Y == 0f) {
 							if (m > npc.whoAmI)
 								dist.X = 1f;
 							else
@@ -1964,25 +1952,18 @@ namespace Macrocosm {
 				}
 				npcAvoidCollision = m;
 			}
-			if (speedupOverTime)
-			{
+			if (speedupOverTime) {
 				float timerMax = 120f;
-				if (npc.localAI[0] < timerMax)
-				{
-					if (npc.localAI[0] == 0f)
-					{
-						Main.PlaySound(SoundID.Item8, npc.Center);
+				if (npc.localAI[0] < timerMax) {
+					if (npc.localAI[0] == 0f) {
+						SoundEngine.PlaySound(SoundID.Item8, npc.Center);
 						npc.TargetClosest(true);
-						if (npc.direction > 0)
-						{
+						if (npc.direction > 0) {
 							npc.velocity.X = npc.velocity.X + 2f;
-						}
-						else
-						{
+						} else {
 							npc.velocity.X = npc.velocity.X - 2f;
 						}
-						for (int m = 0; m < 20; m = npcAvoidCollision + 1)
-						{
+						for (int m = 0; m < 20; m = npcAvoidCollision + 1) {
 							npcAvoidCollision = m;
 						}
 					}
@@ -1990,21 +1971,17 @@ namespace Macrocosm {
 					float timerPartial = 1f - npc.localAI[0] / timerMax;
 					float timerPartialTimes20 = timerPartial * 20f;
 					int nextNPC = 0;
-					while ((float)nextNPC < timerPartialTimes20)
-					{
+					while ((float)nextNPC < timerPartialTimes20) {
 						npcAvoidCollision = nextNPC;
 						nextNPC = npcAvoidCollision + 1;
 					}
 				}
 			}
-			if (npc.ai[0] == 0f)
-			{
+			if (npc.ai[0] == 0f) {
 				npc.TargetClosest(true);
 				npc.ai[0] = 1f;
 				npc.ai[1] = (float)npc.direction;
-			}
-			else if (npc.ai[0] == 1f)
-			{
+			} else if (npc.ai[0] == 1f) {
 				npc.TargetClosest(true);
 				npc.velocity.X = npc.velocity.X + npc.ai[1] * velIntervalX;
 				
@@ -2023,8 +2000,7 @@ namespace Macrocosm {
 					playerDistY = -velMaxY;
 				
 				npc.velocity.Y = (npc.velocity.Y * (velScalarY - 1f) + playerDistY) / velScalarY;
-				if ((npc.ai[1] > 0f && Main.player[npc.target].Center.X - npc.Center.X < -distanceBeforeTakeoff) || (npc.ai[1] < 0f && Main.player[npc.target].Center.X - npc.Center.X > distanceBeforeTakeoff))
-				{
+				if ((npc.ai[1] > 0f && Main.player[npc.target].Center.X - npc.Center.X < -distanceBeforeTakeoff) || (npc.ai[1] < 0f && Main.player[npc.target].Center.X - npc.Center.X > distanceBeforeTakeoff)) {
 					npc.ai[0] = 2f;
 					npc.ai[1] = 0f;
 					if (npc.Center.Y + 20f > Main.player[npc.target].Center.Y)
@@ -2032,23 +2008,18 @@ namespace Macrocosm {
 					else
 						npc.ai[1] = 1f;
 				}
-			}
-			else if (npc.ai[0] == 2f)
-			{
+			} else if (npc.ai[0] == 2f) {
 				npc.velocity.Y = npc.velocity.Y + npc.ai[1] * velIntervalYTurn;
 				
 				if (npc.velocity.Length() > velIntervalMaxTurn)
 					npc.velocity *= velIntervalScalar;
 				
-				if (npc.velocity.X > -1f && npc.velocity.X < 1f)
-				{
+				if (npc.velocity.X > -1f && npc.velocity.X < 1f) {
 					npc.TargetClosest(true);
 					npc.ai[0] = 3f;
 					npc.ai[1] = (float)npc.direction;
 				}
-			}
-			else if (npc.ai[0] == 3f)
-			{
+			} else if (npc.ai[0] == 3f) {
 				npc.velocity.X = npc.velocity.X + npc.ai[1] * velIntervalXTurn;
 				
 				if (npc.Center.Y > Main.player[npc.target].Center.Y)
@@ -2059,8 +2030,7 @@ namespace Macrocosm {
 				if (npc.velocity.Length() > velIntervalMaxTurn)
 					npc.velocity *= velIntervalScalar;
 				
-				if (npc.velocity.Y > -1f && npc.velocity.Y < 1f)
-				{
+				if (npc.velocity.Y > -1f && npc.velocity.Y < 1f) {
 					npc.TargetClosest(true);
 					npc.ai[0] = 0f;
 					npc.ai[1] = (float)npc.direction;
@@ -2068,46 +2038,33 @@ namespace Macrocosm {
 			}																
 		}
 		
-		
-		public static void AISpaceOctopus(NPC npc, ref float[] ai, float moveSpeed = 0.15f, float velMax = 5f, float hoverDistance = 250f, float shootProjInterval = 70f, Action<NPC, Vector2> FireProj = null)
-		{
+		public static void AISpaceOctopus(NPC npc, ref float[] ai, float moveSpeed = 0.15f, float velMax = 5f, float hoverDistance = 250f, float shootProjInterval = 70f, Action<NPC, Vector2> FireProj = null) {
 			npc.TargetClosest(true);		
 			AISpaceOctopus(npc, ref ai, Main.player[npc.target].Center, moveSpeed, velMax, hoverDistance, shootProjInterval, FireProj);
 		}
 
-		public static void AISpaceOctopus(NPC npc, ref float[] ai, Vector2 targetCenter = default(Vector2), float moveSpeed = 0.15f, float velMax = 5f, float hoverDistance = 250f, float shootProjInterval = 70f, Action<NPC, Vector2> FireProj = null)
-		{
+		public static void AISpaceOctopus(NPC npc, ref float[] ai, Vector2 targetCenter = default(Vector2), float moveSpeed = 0.15f, float velMax = 5f, float hoverDistance = 250f, float shootProjInterval = 70f, Action<NPC, Vector2> FireProj = null) {
 			Vector2 wantedVelocity = targetCenter - npc.Center + new Vector2(0f, -hoverDistance);
 			float dist = wantedVelocity.Length();
-			if (dist < 20f)
-			{
+			if (dist < 20f) {
 				wantedVelocity = npc.velocity;
-			}
-			else if (dist < 40f)
-			{
+			} else if (dist < 40f) {
 				wantedVelocity.Normalize();
 				wantedVelocity *= velMax * 0.35f;
-			}
-			else if (dist < 80f)
-			{
+			} else if (dist < 80f) {
 				wantedVelocity.Normalize();
 				wantedVelocity *= velMax * 0.65f;
-			}
-			else
-			{
+			} else {
 				wantedVelocity.Normalize();
 				wantedVelocity *= velMax;
 			}
 			npc.SimpleFlyMovement(wantedVelocity, moveSpeed);
 			npc.rotation = npc.velocity.X * 0.1f;
-			if (FireProj != null && shootProjInterval > -1 && (ai[0] += 1f) >= shootProjInterval)
-			{
+			if (FireProj != null && shootProjInterval > -1 && (ai[0] += 1f) >= shootProjInterval) {
 				ai[0] = 0f;
-				if (Main.netMode != 1)
-				{
+				if (Main.netMode != 1) {
 					Vector2 projVelocity = Vector2.Zero;
-					while (Math.Abs(projVelocity.X) < 1.5f)
-					{
+					while (Math.Abs(projVelocity.X) < 1.5f) {
 						projVelocity = Vector2.UnitY.RotatedByRandom(1.5707963705062866) * new Vector2(5f, 3f);
 					}
 					FireProj(npc, projVelocity);
@@ -2115,8 +2072,7 @@ namespace Macrocosm {
 			}	
 		}
 
-		public static void AIElemental(NPC npc, ref float[] ai, bool? noDamageMode = null, int noDamageTimeMax = 120, bool gravityChange = true, bool tileCollideChange = true, float startPhaseDist = 800f, float stopPhaseDist = 600f, int idleTooLong = 180, float velSpeed = 2f)
-		{
+		public static void AIElemental(NPC npc, ref float[] ai, bool? noDamageMode = null, int noDamageTimeMax = 120, bool gravityChange = true, bool tileCollideChange = true, float startPhaseDist = 800f, float stopPhaseDist = 600f, int idleTooLong = 180, float velSpeed = 2f) {
 			int timerDummy = (int)npc.localAI[0];
 			AIElemental(npc, ref ai, ref timerDummy, noDamageMode, noDamageTimeMax, gravityChange, tileCollideChange, startPhaseDist, stopPhaseDist, idleTooLong, velSpeed);
 			npc.localAI[0] = timerDummy;
@@ -2135,8 +2091,7 @@ namespace Macrocosm {
 		 * idleTooLong : The maximum amount of ticks the npc can be 'idle' before it attempts to change movement modes. (default 180)
 		 * velSpeed : The speed of the entity when moving to the player. This value is used for all states; changing it speeds or slows the npc in all of them.
 		 */
-		public static void AIElemental(NPC npc, ref float[] ai, ref int idleTimer, bool? noDamageMode = null, int noDamageTimeMax = 120, bool gravityChange = true, bool tileCollideChange = true, float startPhaseDist = 800f, float stopPhaseDist = 600f, int idleTooLong = 180, float velSpeed = 2f)
-		{
+		public static void AIElemental(NPC npc, ref float[] ai, ref int idleTimer, bool? noDamageMode = null, int noDamageTimeMax = 120, bool gravityChange = true, bool tileCollideChange = true, float startPhaseDist = 800f, float stopPhaseDist = 600f, int idleTooLong = 180, float velSpeed = 2f) {
 			bool noDmg = (noDamageMode == null ? Main.expertMode : (bool)noDamageMode);
 			if(gravityChange) npc.noGravity = true;
 			if(tileCollideChange) npc.noTileCollide = false;
@@ -2144,73 +2099,61 @@ namespace Macrocosm {
 			Player targetPlayer = (npc.target < 0 ? null : Main.player[npc.target]);
 			Vector2 playerCenter = (targetPlayer == null ? npc.Center + new Vector2(0, 5f) : targetPlayer.Center);
 			Vector2 dist = playerCenter - npc.Center;
-			
-			if (npc.justHit && Main.netMode != 1 && noDmg && Main.rand.Next(6) == 0)
-			{
+
+            if (npc.justHit && Main.netMode != 1 && noDmg && Main.rand.NextBool(6)) {
 				npc.netUpdate = true;
 				ai[0] = -1f;
 				ai[1] = 0f;
 			}
-			if (ai[0] == -1f) //immortal
-			{
+			if (ai[0] == -1f) { //immortal
 				if(noDmg) npc.dontTakeDamage = true;
 				if(gravityChange) npc.noGravity = false;
 				npc.velocity.X = npc.velocity.X * 0.98f;
 				ai[1] += 1f;
-				if (ai[1] >= noDamageTimeMax)
-				{
+				if (ai[1] >= noDamageTimeMax) {
 					ai[0] = (ai[1] = (ai[2] = (ai[3] = 0f)));
 					return;
 				}
-			}
-			else if (ai[0] == 0f) //targeting mode (chosing how to act)
-			{
+			} else if (ai[0] == 0f) { //targeting mode (chosing how to act)
 				npc.TargetClosest(true);
 				targetPlayer = Main.player[npc.target];
 				playerCenter = targetPlayer.Center;
 				dist = playerCenter - npc.Center;
-				if (Collision.CanHit(npc.Center, 1, 1, playerCenter, 1, 1))
-				{
+				if (Collision.CanHit(npc.Center, 1, 1, playerCenter, 1, 1)) {
 					ai[0] = 1f;
 					return;
 				}
 				Vector2 centerDiff = playerCenter - npc.Center;
 				centerDiff.Y -= (float)(targetPlayer.height / 4);
 				float centerDist = centerDiff.Length();
-				if (centerDist > startPhaseDist)
-				{
+				if (centerDist > startPhaseDist) {
 					ai[0] = 2f;
 					return;
 				}
 				Vector2 npcCenter = npc.Center;
 				npcCenter.X = playerCenter.X;
 				Vector2 npcCentDiff = npcCenter - npc.Center;
-				if (npcCentDiff.Length() > 8f && Collision.CanHit(npc.Center, 1, 1, npcCenter, 1, 1))
-				{
+				if (npcCentDiff.Length() > 8f && Collision.CanHit(npc.Center, 1, 1, npcCenter, 1, 1)) {
 					ai[0] = 3f;
 					ai[1] = npcCenter.X;
 					ai[2] = npcCenter.Y;
 					Vector2 npcCenter2 = npc.Center;
 					npcCenter2.Y = playerCenter.Y;
-					if (npcCentDiff.Length() > 8f && Collision.CanHit(npc.Center, 1, 1, npcCenter2, 1, 1) && Collision.CanHit(npcCenter2, 1, 1, targetPlayer.position, 1, 1))
-					{
+					if (npcCentDiff.Length() > 8f && Collision.CanHit(npc.Center, 1, 1, npcCenter2, 1, 1) && Collision.CanHit(npcCenter2, 1, 1, targetPlayer.position, 1, 1)) {
 						ai[0] = 3f;
 						ai[1] = npcCenter2.X;
 						ai[2] = npcCenter2.Y;
 					}
-				}else
-				{
+				} else {
 					npcCenter = npc.Center;
 					npcCenter.Y = playerCenter.Y;
-					if ((npcCenter - npc.Center).Length() > 8f && Collision.CanHit(npc.Center, 1, 1, npcCenter, 1, 1))
-					{
+					if ((npcCenter - npc.Center).Length() > 8f && Collision.CanHit(npc.Center, 1, 1, npcCenter, 1, 1)) {
 						ai[0] = 3f;
 						ai[1] = npcCenter.X;
 						ai[2] = npcCenter.Y;
 					}
 				}
-				if (ai[0] == 0f)
-				{
+				if (ai[0] == 0f) {
 					npc.localAI[0] = 0f;
 					centerDiff.Normalize();
 					centerDiff *= 0.5f;
@@ -2400,25 +2343,20 @@ namespace Macrocosm {
 		 * moveInterval : The amount to move by per tick.
 		 * rotAmt : The amount to rotate by when reaching corners.
          */
-		public static void AISnail(NPC npc, ref float[] ai, ref int snailStatus, float moveInterval = 0.3f, float rotAmt = 0.1f)
-		{
-			if (ai[0] == 0f)
-			{
+		public static void AISnail(NPC npc, ref float[] ai, ref int snailStatus, float moveInterval = 0.3f, float rotAmt = 0.1f) {
+			if (ai[0] == 0f) {
 				npc.TargetClosest(true); npc.directionY = 1; ai[0] = 1f;
 				if (npc.direction > 0){ npc.spriteDirection = 1; }
 			}
 			bool collisonOnX = false;
-			if (Main.netMode != 1)
-			{
+			if (Main.netMode != 1) {
 				if (ai[2] == 0f && Main.rand.Next(7200) == 0){ ai[2] = 2f; npc.netUpdate = true; }
-				if (!npc.collideX && !npc.collideY)
-				{
+				if (!npc.collideX && !npc.collideY) {
 					npc.localAI[3] += 1f;
 					if (npc.localAI[3] > 5f){ ai[2] = 2f; npc.netUpdate = true; }
-				}else{ npc.localAI[3] = 0f; }
+				} else { npc.localAI[3] = 0f; }
 			}
-			if (ai[2] > 0f)
-			{
+			if (ai[2] > 0f) {
 				ai[1] = 0f; ai[0] = 1f; npc.directionY = 1;
 				if (npc.velocity.Y > moveInterval){ npc.rotation += (float)npc.direction * 0.1f; }else{ npc.rotation = 0f; }
 				npc.spriteDirection = npc.direction;
@@ -2432,99 +2370,77 @@ namespace Macrocosm {
 				//tileY = (int)(npc.position.Y + (float)npc.height - 4f) / 16;
 				//if (Main.tile[num1058, scaleChange] != null && Main.tile[num1058, scaleChange].bottomSlope()){ npc.direction *= -1; }
 				if (npc.collideX && npc.velocity.Y == 0f){ collisonOnX = true; ai[2] = 0f; ai[1] = 1f; npc.directionY = -1; }
-				if (npc.velocity.Y == 0f)
-				{
-					if (npc.localAI[1] == npc.position.X)
-					{
+				if (npc.velocity.Y == 0f) {
+					if (npc.localAI[1] == npc.position.X) {
 						npc.localAI[2] += 1f;
-						if (npc.localAI[2] > 10f)
-						{
+						if (npc.localAI[2] > 10f) {
 							npc.direction = 1;
 							npc.velocity.X = (float)npc.direction * moveInterval;
 							npc.localAI[2] = 0f;
 						}
-					}else{ npc.localAI[2] = 0f; npc.localAI[1] = npc.position.X; }
+					} else { npc.localAI[2] = 0f; npc.localAI[1] = npc.position.X; }
 				}
 			}
-			if (ai[2] == 0f)
-			{
+			if (ai[2] == 0f) {
 				npc.noGravity = true;
-				if (ai[1] == 0f)
-				{
+				if (ai[1] == 0f) {
 					if (npc.collideY){ ai[0] = 2f; }
-					if (!npc.collideY && ai[0] == 2f)
-					{
+					if (!npc.collideY && ai[0] == 2f) {
 						npc.direction = -npc.direction;
 						ai[1] = 1f;
 						ai[0] = 1f;
 					}
 					if (npc.collideX){ npc.directionY = -npc.directionY; ai[1] = 1f; }
-				}else
-				{
+				} else {
 					if (npc.collideX){ ai[0] = 2f; }
-					if (!npc.collideX && ai[0] == 2f)
-					{
+					if (!npc.collideX && ai[0] == 2f) {
 						npc.directionY = -npc.directionY;
 						ai[1] = 0f;
 						ai[0] = 1f;
 					}
 					if (npc.collideY){ npc.direction = -npc.direction; ai[1] = 0f; }
 				}
-				if (!collisonOnX)
-				{
+				if (!collisonOnX) {
 					float prevRot = npc.rotation;
-					if (npc.directionY < 0)
-					{
-						if (npc.direction < 0)
-						{
-							if (npc.collideX)
-							{
+					if (npc.directionY < 0) {
+						if (npc.direction < 0) {
+							if (npc.collideX) {
 								npc.rotation = 1.57f;
 								npc.spriteDirection = -1;
-							}else if (npc.collideY)
-							{
+							} else if (npc.collideY) {
 								npc.rotation = 3.14f;
 								npc.spriteDirection = 1;
 							}
-						}else if (npc.collideY)
-						{
+						} else if (npc.collideY) {
 							npc.rotation = 3.14f;
 							npc.spriteDirection = -1;
-						}else if (npc.collideX)
-						{
+						} else if (npc.collideX) {
 							npc.rotation = 4.71f;
 							npc.spriteDirection = 1;
 						}
-					}else 
-					if (npc.direction < 0)
-					{
+					} else if (npc.direction < 0) {
 						if (npc.collideY)
 						{
 							npc.rotation = 0f;
 							npc.spriteDirection = -1;
-						}else if (npc.collideX)
-						{
+						} else if (npc.collideX) {
 							npc.rotation = 1.57f;
 							npc.spriteDirection = 1;
 						}
-					}else if (npc.collideX){ npc.rotation = 4.71f; npc.spriteDirection = -1; }else 
+					} else if (npc.collideX){ npc.rotation = 4.71f; npc.spriteDirection = -1; }else 
 					if (npc.collideY){ npc.rotation = 0f; npc.spriteDirection = 1; }
 					float prevRot2 = npc.rotation;
 					npc.rotation = prevRot;
 					if (npc.rotation > 6.28){ npc.rotation -= 6.28f; } if (npc.rotation < 0f){ npc.rotation += 6.28f; }
 					float rotDiffAbs = Math.Abs(npc.rotation - prevRot2);
-					if (npc.rotation > prevRot2)
-					{
-						if (rotDiffAbs > 3.14){ npc.rotation += rotAmt; }else
-						{
+					if (npc.rotation > prevRot2) {
+						if (rotDiffAbs > 3.14){ npc.rotation += rotAmt; }else {
 							npc.rotation -= rotAmt;
 							if (npc.rotation < prevRot2){ npc.rotation = prevRot2; }
 						}
 					}
-					if (npc.rotation < prevRot2)
-					{
-						if (rotDiffAbs > 3.14){ npc.rotation -= rotAmt; }else
-						{
+					if (npc.rotation < prevRot2) {
+						if (rotDiffAbs > 3.14){ npc.rotation -= rotAmt; }else {
 							npc.rotation += rotAmt;
 							if (npc.rotation > prevRot2){ npc.rotation = prevRot2; }
 						}
@@ -2540,33 +2456,29 @@ namespace Macrocosm {
 			}
 		}
 
-		public static void CollisionTest(NPC npc, ref bool left, ref bool right, ref bool up, ref bool down)
-		{
+		public static void CollisionTest(NPC npc, ref bool left, ref bool right, ref bool up, ref bool down) {
 			up = down = left = right = false;
 			int lengthX = (npc.width / 16) + (npc.width % 16 > 0 ? 1 : 0);
 			int lengthY = (npc.height / 16) + (npc.height % 16 > 0 ? 1 : 0);			
 			int xLeft = Math.Max(0, Math.Min(Main.maxTilesX - 1, (int)(npc.position.X / 16f) - 1)), xRight = Math.Max(0, Math.Min(Main.maxTilesX - 1, xLeft + lengthX + 1));
 			int yUp = Math.Max(0, Math.Min(Main.maxTilesY - 1, (int)(npc.position.Y / 16f) - 1)), yDown = Math.Max(0, Math.Min(Main.maxTilesY - 1, yUp + lengthY + 1));
 			//TOP/DOWN
-			for(int x2 = xLeft; x2 < xRight; x2++)
-			{
+			for(int x2 = xLeft; x2 < xRight; x2++) {
 				Tile tileUp = Main.tile[x2, yUp], tileDown = Main.tile[x2, yDown];
-				if(tileUp != null && tileUp.nactive() && Main.tileSolid[tileUp.type] && !Main.tileSolidTop[tileUp.type]) up = true;
-				if(tileDown != null && tileDown.nactive() && Main.tileSolid[tileDown.type]) down = true;		
+				if(tileUp != null && tileUp.HasUnactuatedTile && Main.tileSolid[tileUp.TileType] && !Main.tileSolidTop[tileUp.TileType]) up = true;
+				if(tileDown != null && tileDown.HasUnactuatedTile && Main.tileSolid[tileDown.TileType]) down = true;		
 				if(up && down) break;
 			}
 			//LEFT/RIGHT
-			for(int y2 = yUp; y2 < yDown; y2++)
-			{
+			for(int y2 = yUp; y2 < yDown; y2++) {
 				Tile tileLeft = Main.tile[xLeft, y2], tileRight = Main.tile[xRight, y2];
-				if(tileLeft != null && tileLeft.nactive() && Main.tileSolid[tileLeft.type] && !Main.tileSolidTop[tileLeft.type]) left = true;
-				if(tileRight != null && tileRight.nactive() && Main.tileSolid[tileRight.type] && !Main.tileSolidTop[tileRight.type]) right = true;	
+				if(tileLeft != null && tileLeft.HasUnactuatedTile && Main.tileSolid[tileLeft.TileType] && !Main.tileSolidTop[tileLeft.TileType]) left = true;
+				if(tileRight != null && tileRight.HasUnactuatedTile && Main.tileSolid[tileRight.TileType] && !Main.tileSolidTop[tileRight.TileType]) right = true;	
 				if(left && right) break;				
 			}
 		}
 
-		public static void AISpore(NPC npc, ref float[] ai, float moveIntervalX = 0.1f, float moveIntervalY = 0.02f, float maxSpeedX = 5f, float maxSpeedY = 1f)
-		{
+		public static void AISpore(NPC npc, ref float[] ai, float moveIntervalX = 0.1f, float moveIntervalY = 0.02f, float maxSpeedX = 5f, float maxSpeedY = 1f) {
 			npc.TargetClosest(true);
 			AISpore(npc, ref ai, Main.player[npc.target].Center, Main.player[npc.target].width, moveIntervalX, moveIntervalY, maxSpeedX, maxSpeedY);
 		}
@@ -2582,18 +2494,15 @@ namespace Macrocosm {
 		 * maxSpeedX : The maximum speed of the codable on the X axis.
 		 * maxSpeedY : The maximum speed of the codable on the Y axis.
          */
-		public static void AISpore(Entity codable, ref float[] ai, Vector2 target, int targetWidth = 16, float moveIntervalX = 0.1f, float moveIntervalY = 0.02f, float maxSpeedX = 5f, float maxSpeedY = 1f)
-		{
+		public static void AISpore(Entity codable, ref float[] ai, Vector2 target, int targetWidth = 16, float moveIntervalX = 0.1f, float moveIntervalY = 0.02f, float maxSpeedX = 5f, float maxSpeedY = 1f) {
 			codable.velocity.Y += moveIntervalY;
 			if (codable.velocity.Y < 0f) codable.velocity.Y *= 0.99f;
 			if (codable.velocity.Y > 1f) codable.velocity.Y = 1f;
 			int widthHalf = targetWidth / 2;
-			if (codable.position.X + codable.width < target.X - widthHalf)
-			{
+			if (codable.position.X + codable.width < target.X - widthHalf) {
 				if (codable.velocity.X < 0) codable.velocity.X *= 0.98f;
 				codable.velocity.X += moveIntervalX;
-			}else if (codable.position.X > target.X + widthHalf)
-			{
+			} else if (codable.position.X > target.X + widthHalf) {
 				if (codable.velocity.X > 0) codable.velocity.X *= 0.98f;
 				codable.velocity.X -= moveIntervalX;
 			}
@@ -2611,11 +2520,9 @@ namespace Macrocosm {
          * allowBoredom : If false, npc will not get 'bored' trying to harass a target and wander off.
          * ticksUntilBoredom : the amount of ticks until the npc gets 'bored' following a target.
          */
-		public static void AICharger(NPC npc, ref float[] ai, float moveInterval = 0.07f, float maxSpeed = 6f, bool allowBoredom = true, int ticksUntilBoredom = 30)
-		{
+		public static void AICharger(NPC npc, ref float[] ai, float moveInterval = 0.07f, float maxSpeed = 6f, bool allowBoredom = true, int ticksUntilBoredom = 30) {
 			bool isMoving = false;
-			if (npc.velocity.Y == 0f && (npc.velocity.X > 0f && npc.direction < 0 || npc.velocity.X < 0f && npc.direction > 0))
-			{
+			if (npc.velocity.Y == 0f && (npc.velocity.X > 0f && npc.direction < 0 || npc.velocity.X < 0f && npc.direction > 0)) {
 				isMoving = true;
 				++ai[3];
 			}
@@ -2629,33 +2536,25 @@ namespace Macrocosm {
 			float distY = Main.player[npc.target].Center.Y - npcCenter.Y;
 			float dist = (float)Math.Sqrt(distX * distX + distY * distY);
 			if (dist < 200f) ai[3] = 0f;
-			if (!allowBoredom || ai[3] < ticksUntilBoredom)
-			{
+			if (!allowBoredom || ai[3] < ticksUntilBoredom) {
 				npc.TargetClosest(true);
-			}else
-			{
-				if (npc.velocity.X == 0f)
-				{
-					if (npc.velocity.Y == 0f)
-					{
+			} else {
+				if (npc.velocity.X == 0f) {
+					if (npc.velocity.Y == 0f) {
 						++ai[0];
 						if (ai[0] >= 2.0){ npc.direction *= -1; npc.spriteDirection = npc.direction; ai[0] = 0f; }
 					}
-				}else ai[0] = 0f;
+				} else ai[0] = 0f;
 				npc.directionY = -1;
 				if (npc.direction == 0) npc.direction = 1;
 			}
-			if (npc.velocity.Y == 0f || npc.wet || (npc.velocity.X <= 0f && npc.direction < 0) || (npc.velocity.X >= 0f && npc.direction > 0))
-			{
-				if (npc.velocity.X < -maxSpeed || npc.velocity.X > maxSpeed)
-				{
+			if (npc.velocity.Y == 0f || npc.wet || (npc.velocity.X <= 0f && npc.direction < 0) || (npc.velocity.X >= 0f && npc.direction > 0)) {
+				if (npc.velocity.X < -maxSpeed || npc.velocity.X > maxSpeed) {
 					if (npc.velocity.Y == 0f) npc.velocity *= 0.8f;
-				}else if (npc.velocity.X < maxSpeed && npc.direction == 1)
-				{
+				} else if (npc.velocity.X < maxSpeed && npc.direction == 1) {
 					npc.velocity.X += moveInterval;
 					if (npc.velocity.X > maxSpeed) npc.velocity.X = maxSpeed;
-				}else if (npc.velocity.X > -maxSpeed && npc.direction == -1)
-				{
+				} else if (npc.velocity.X > -maxSpeed && npc.direction == -1) {
 					npc.velocity.X -= moveInterval;
 					if (npc.velocity.X < -maxSpeed) npc.velocity.X = -maxSpeed;
 				}
@@ -2673,15 +2572,13 @@ namespace Macrocosm {
 		 * canFindHouse : If true, the npc can search for a home. If false, it will only ever attempt to teleport to it's preset home.
 		 * canOpenDoors : If true, the npc can open and close doors.
          */
-		public static void AIFriendly(NPC npc, ref float[] ai, float moveInterval = 0.07f, float maxSpeed = 1f, bool critter = false, bool? seekHome = null, bool canTeleportHome = true, bool canFindHouse = true, bool canOpenDoors = true)
-		{
+		public static void AIFriendly(NPC npc, ref float[] ai, float moveInterval = 0.07f, float maxSpeed = 1f, bool critter = false, bool? seekHome = null, bool canTeleportHome = true, bool canFindHouse = true, bool canOpenDoors = true) {
 			bool seekHouse = Main.raining;
 			if (!Main.dayTime || Main.eclipse) seekHouse = true;
 			if (seekHome != null) seekHouse = (bool)seekHome;
 			int npcTileX = (int)((double)npc.position.X + (double)(npc.width / 2)) / 16;
 			int npcTileY = (int)((double)npc.position.Y + (double)npc.height + 1.0) / 16;
-			if (critter && npc.target == 255)
-			{
+			if (critter && npc.target == 255) {
 				npc.TargetClosest(true);
 				npc.direction = npc.Center.X < Main.player[npc.target].Center.X ? 1 : -1;
 				npc.spriteDirection = npc.direction;
@@ -2691,101 +2588,82 @@ namespace Macrocosm {
 			npc.directionY = -1;
 			if (npc.direction == 0) npc.direction = 1;
 			//Sets AI if the npc is speaking to a player
-			for (int m1 = 0; m1 < 255; ++m1)
-			{
-				if (Main.player[m1].active && Main.player[m1].talkNPC == npc.whoAmI)
-				{
+			for (int m1 = 0; m1 < 255; ++m1) {
+				if (Main.player[m1].active && Main.player[m1].talkNPC == npc.whoAmI) {
 					isTalking = true;
 					if (ai[0] != 0f) npc.netUpdate = true;
 					ai[0] = 0f; ai[1] = 300f; ai[2] = 100f;
 					npc.direction = Main.player[m1].Center.X >= npc.Center.X ? 1 : -1;
 				}
 			}
-			if (ai[3] > 0f)
-			{
+			if (ai[3] > 0f) {
 				npc.life = -1;
 				npc.HitEffect(0, 10.0);
 				npc.active = false;
 				if (npc.type == 37)
-					Main.PlaySound(15, (int)npc.position.X, (int)npc.position.Y, 0);
+					SoundEngine.PlaySound(SoundID.Dig, npc.position);
 			}
 			//prevent a -1, -1 saving scenario
-			if ((npc.type >= Main.maxNPCTypes && npc.homeTileX == -1 && npc.homeTileY == -1) || (npc.homeTileX == ushort.MaxValue && npc.homeTileY == ushort.MaxValue))
-			{
+			if ((npc.type >= Main.maxNPCTypes && npc.homeTileX == -1 && npc.homeTileY == -1) || (npc.homeTileX == ushort.MaxValue && npc.homeTileY == ushort.MaxValue)) {
 				npc.homeTileX = (int)npc.Center.X / 16;
 				npc.homeTileY = (int)npc.Center.Y / 16;
 			}
 			int homeTileY = npc.homeTileY;
-			if (Main.netMode != 1 && npc.homeTileY > 0)
-			{
+			if (Main.netMode != 1 && npc.homeTileY > 0) {
 				while (!WorldGen.SolidTile(npc.homeTileX, homeTileY) && homeTileY < Main.maxTilesY - 20)
 					++homeTileY;
 			}
 			//handle teleporting to the home tile
-			if (Main.netMode != 1 && canTeleportHome && seekHouse && ((npcTileX != npc.homeTileX || npcTileY != homeTileY) && !npc.homeless))
-			{
+			if (Main.netMode != 1 && canTeleportHome && seekHouse && ((npcTileX != npc.homeTileX || npcTileY != homeTileY) && !npc.homeless)) {
 				bool moveToHome = true;
 				for (int m2 = 0; m2 < 2; ++m2)
 				{
 					Rectangle checkRect = new Rectangle((int)(npc.Center.X - (NPC.sWidth / 2) - NPC.safeRangeX), (int)(npc.Center.Y - (NPC.sHeight / 2) - NPC.safeRangeY), NPC.sWidth + NPC.safeRangeX * 2, NPC.sHeight + NPC.safeRangeY * 2);
 					if (m2 == 1)
 						checkRect = new Rectangle(npc.homeTileX * 16 + 8 - NPC.sWidth / 2 - NPC.safeRangeX, homeTileY * 16 + 8 - NPC.sHeight / 2 - NPC.safeRangeY, NPC.sWidth + NPC.safeRangeX * 2, NPC.sHeight + NPC.safeRangeY * 2);
-					for (int m3 = 0; m3 < 255; m3++)
-					{
+					for (int m3 = 0; m3 < 255; m3++) {
 						if (Main.player[m3].active && Main.player[m3].Hitbox.Intersects(checkRect)){ moveToHome = false; break; }else 
 						if (!moveToHome) break;
 					}
 				}
-				if (moveToHome)
-				{
-					if (!Collision.SolidTiles(npc.homeTileX - 1, npc.homeTileX + 1, homeTileY - 3, homeTileY - 1)) //either move to preestablished home..
-					{
+				if (moveToHome) {
+					if (!Collision.SolidTiles(npc.homeTileX - 1, npc.homeTileX + 1, homeTileY - 3, homeTileY - 1)) { //either move to preestablished home..
 						npc.velocity.X = 0.0f;
 						npc.velocity.Y = 0.0f;
 						npc.position.X = (float)(npc.homeTileX * 16 + 8 - npc.width / 2);
 						npc.position.Y = (float)(homeTileY * 16 - npc.height) - 0.1f;
 						npc.netUpdate = true;
-					}else //or find a new one
-					if(canFindHouse)
-					{
+					} else if (canFindHouse) { //or find a new one
 						npc.homeless = true;
 						WorldGen.QuickFindHome(npc.whoAmI);
 					}
 				}
 			}
 			//slow down
-			if (ai[0] == 0f)
-			{
+			if (ai[0] == 0f) {
 				if (ai[2] > 0f) --ai[2];
-				if (seekHouse && !isTalking && !critter)
-				{
-					if (Main.netMode != 1)
-					{
+				if (seekHouse && !isTalking && !critter) {
+					if (Main.netMode != 1) {
 						//stop at the home tile
-						if (npcTileX == npc.homeTileX && npcTileY == homeTileY)
-						{
+						if (npcTileX == npc.homeTileX && npcTileY == homeTileY) {
 							if (npc.velocity.X != 0f) npc.netUpdate = true;
 							if (npc.velocity.X > 0.1f) npc.velocity.X -= 0.1f;
 							else if (npc.velocity.X < -0.1f) npc.velocity.X += 0.1f;
 							else npc.velocity.X = 0f;
-						}else
-						{
+						} else {
 							npc.direction = npcTileX <= npc.homeTileX ? 1 : -1;
 							ai[0] = 1f; ai[1] = (float)(200 + Main.rand.Next(200)); ai[2] = 0f;
 							npc.netUpdate = true;
 						}
 					}
-				}else
-				{
+				} else {
 					//just stop in general
 					if (npc.velocity.X > 0.1f) npc.velocity.X -= 0.1f;
 					else if (npc.velocity.X < -0.1f) npc.velocity.X += 0.1f;
 					else npc.velocity.X = 0f;
-					if (Main.netMode != 1)
-					{
+					if (Main.netMode != 1) {
 						if (ai[1] > 0) --ai[1];
-						if (ai[1] <= 0)
-						{
+						if (ai[1] <= 0) {
 							ai[0] = 1f;
 							ai[1] = (float)(200 + Main.rand.Next(200));
 							if (critter) ai[1] += (float)Main.rand.Next(200, 400);
@@ -2796,61 +2674,50 @@ namespace Macrocosm {
 				}
 				if (Main.netMode == 1 || seekHouse && (npcTileX != npc.homeTileX || npcTileY != homeTileY)) return;
 				//move towards the home point
-				if (npcTileX < npc.homeTileX - 25 || npcTileX > npc.homeTileX + 25)
-				{
+				if (npcTileX < npc.homeTileX - 25 || npcTileX > npc.homeTileX + 25) {
 					if (ai[2] != 0f) return;
 					if (npcTileX < npc.homeTileX - 50 && npc.direction == -1){ npc.direction = 1; npc.netUpdate = true; }else
 					{ if (npcTileX <= npc.homeTileX + 50 || npc.direction != 1) return; npc.direction = -1; npc.netUpdate = true; }
-				}else
-				{
+				} else {
 					if (Main.rand.Next(80) != 0 || (double)ai[2] != 0) return;
 					ai[2] = 200f;
 					npc.direction *= -1;
 					npc.netUpdate = true;
 				}
-			}else
+			} else
 			if (ai[0] != 1) { return; }else
 			//move around within the home
-			if (Main.netMode != 1 && !critter && seekHouse && npcTileX == npc.homeTileX && npcTileY == npc.homeTileY)
-			{
+			if (Main.netMode != 1 && !critter && seekHouse && npcTileX == npc.homeTileX && npcTileY == npc.homeTileY) {
 				ai[0] = 0f; ai[1] = (float)(200 + Main.rand.Next(200)); ai[2] = 60f;
 				npc.netUpdate = true;
-			}else
-			{
-				if (Main.netMode != 1 && !npc.homeless && !Main.tileDungeon[(int)Main.tile[npcTileX, npcTileY].type] && (npcTileX < npc.homeTileX - 35 || npcTileX > npc.homeTileX + 35))
-				{
+			} else {
+				if (Main.netMode != 1 && !npc.homeless && !Main.tileDungeon[(int)Main.tile[npcTileX, npcTileY].TileType] && (npcTileX < npc.homeTileX - 35 || npcTileX > npc.homeTileX + 35)) {
 					if (npc.Center.X < (npc.homeTileX * 16) && npc.direction == -1)
 						ai[1] -= 5f;
 					else if (npc.Center.X > (npc.homeTileX * 16) && npc.direction == 1)
 						ai[1] -= 5f;
 				}
 				--ai[1];
-				if (ai[1] <= 0f)
-				{
+				if (ai[1] <= 0f) {
 					ai[0] = 0f; ai[1] = (float)(300 + Main.rand.Next(300));
 					if (critter) ai[1] -= (float)Main.rand.Next(100);
 					ai[2] = 60f; npc.netUpdate = true;
 				}
 				//close doors the npc has opened
-				if (npc.closeDoor && ((npc.Center.X / 16f > npc.doorX + 2) || (npc.Center.X / 16f < npc.doorX - 2)))
-				{
-					if (WorldGen.CloseDoor(npc.doorX, npc.doorY, false))
-					{
+				if (npc.closeDoor && ((npc.Center.X / 16f > npc.doorX + 2) || (npc.Center.X / 16f < npc.doorX - 2))) {
+					if (WorldGen.CloseDoor(npc.doorX, npc.doorY, false)) {
 						npc.closeDoor = false;
 						NetMessage.SendData(19, -1, -1, NetworkText.FromLiteral(""), 1, (float)npc.doorX, (float)npc.doorY, (float)npc.direction, 0);
 					}
 					if ((npc.Center.X / 16f > npc.doorX + 4) || (npc.Center.X / 16f < npc.doorX - 4) || (npc.Center.Y / 16f > npc.doorY + 4) || (npc.Center.Y / 16f < npc.doorY - 4))
 						npc.closeDoor = false;
 				}
-				if (npc.Center.X < -maxSpeed || npc.velocity.X > maxSpeed)
-				{
+				if (npc.Center.X < -maxSpeed || npc.velocity.X > maxSpeed) {
 					if (npc.velocity.Y == 0) npc.velocity *= 0.8f;
-				}else if (npc.velocity.X < maxSpeed && npc.direction == 1)
-				{
+				} else if (npc.velocity.X < maxSpeed && npc.direction == 1) {
 					npc.velocity.X += moveInterval;
 					if (npc.velocity.X > maxSpeed) npc.velocity.X = maxSpeed;
-				}else if (npc.velocity.X > -maxSpeed && npc.direction == -1)
-				{
+				} else if (npc.velocity.X > -maxSpeed && npc.direction == -1) {
 					npc.velocity.X -= moveInterval;
 					if (npc.velocity.X > maxSpeed) npc.velocity.X = maxSpeed;
 				}
@@ -2861,23 +2728,21 @@ namespace Macrocosm {
 				int tileX2 = (int)((npc.Center.X + (15 * npc.direction)) / 16f);
 				int tileY2 = (int)((npc.position.Y + npc.height - 16f) / 16f);
 				#region denull tiles
-				if (Main.tile[tileX2, tileY2] == null) Main.tile[tileX2, tileY2] = new Tile();
+				/*if (Main.tile[tileX2, tileY2] == null) Main.tile[tileX2, tileY2] = new Tile();
 				if (Main.tile[tileX2, tileY2 - 1] == null) Main.tile[tileX2, tileY2 - 1] = new Tile();
 				if (Main.tile[tileX2, tileY2 - 2] == null) Main.tile[tileX2, tileY2 - 2] = new Tile();
 				if (Main.tile[tileX2, tileY2 - 3] == null) Main.tile[tileX2, tileY2 - 3] = new Tile();
 				if (Main.tile[tileX2, tileY2 + 1] == null) Main.tile[tileX2, tileY2 + 1] = new Tile();
 				if (Main.tile[tileX2 - npc.direction, tileY2 + 1] == null) Main.tile[tileX2 - npc.direction, tileY2 + 1] = new Tile();
 				if (Main.tile[tileX2 + npc.direction, tileY2 - 1] == null) Main.tile[tileX2 + npc.direction, tileY2 - 1] = new Tile();
-				if (Main.tile[tileX2 + npc.direction, tileY2 + 1] == null) Main.tile[tileX2 + npc.direction, tileY2 + 1] = new Tile();
+				if (Main.tile[tileX2 + npc.direction, tileY2 + 1] == null) Main.tile[tileX2 + npc.direction, tileY2 + 1] = new Tile();*/
 				#endregion
 				//Main.tile[tileX2 - npc.direction, tileY2 + 1].halfBrick();
-				if (canOpenDoors && Main.tile[tileX2, tileY2 - 2].nactive() && (int)Main.tile[tileX2, tileY2 - 2].type == 10 && (Main.rand.Next(10) == 0 || seekHouse))
-				{
+				if (canOpenDoors && Main.tile[tileX2, tileY2 - 2].HasUnactuatedTile && Main.tile[tileX2, tileY2 - 2].TileType == 10 && (Main.rand.NextBool(10)|| seekHouse)) {
 					if (Main.netMode == 1)
 						return;
 					//attempt to open the door...
-					if (WorldGen.OpenDoor(tileX2, tileY2 - 2, npc.direction))
-					{
+					if (WorldGen.OpenDoor(tileX2, tileY2 - 2, npc.direction)) {
 						npc.closeDoor = true;
 						npc.doorX = tileX2;
 						npc.doorY = tileY2 - 2;
@@ -2885,8 +2750,7 @@ namespace Macrocosm {
 						npc.netUpdate = true;
 						ai[1] += 80f;
 					//if that fails, attempt to open it the other way...
-					}else if (WorldGen.OpenDoor(tileX2, tileY2 - 2, -npc.direction))
-					{
+					} else if (WorldGen.OpenDoor(tileX2, tileY2 - 2, -npc.direction)) {
 						npc.closeDoor = true;
 						npc.doorX = tileX2;
 						npc.doorY = tileY2 - 2;
@@ -2894,63 +2758,57 @@ namespace Macrocosm {
 						npc.netUpdate = true;
 						ai[1] += 80f;
 					//if it still fails, you can't open the door, so turn around
-					}else
-					{
+					} else {
 						npc.direction *= -1;
 						npc.netUpdate = true;
 					}
-				}else
-				{
-					if (npc.velocity.X < 0f && npc.spriteDirection == -1 || npc.velocity.X > 0f && npc.spriteDirection == 1)
-					{
-						if (Main.tile[tileX2, tileY2 - 2].nactive() && Main.tileSolid[Main.tile[tileX2, tileY2 - 2].type] && !Main.tileSolidTop[Main.tile[tileX2, tileY2 - 2].type])
-						{
-							if (npc.direction == 1 && !Collision.SolidTiles(tileX2 - 2, tileX2 - 1, tileY2 - 5, tileY2 - 1) || npc.direction == -1 && !Collision.SolidTiles(tileX2 + 1, tileX2 + 2, tileY2 - 5, tileY2 - 1))
-							{
-								if (!Collision.SolidTiles(tileX2, tileX2, tileY2 - 5, tileY2 - 3))
-								{
+				} else {
+					if (npc.velocity.X < 0f && npc.spriteDirection == -1 || npc.velocity.X > 0f && npc.spriteDirection == 1) {
+						if (Main.tile[tileX2, tileY2 - 2].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX2, tileY2 - 2].TileType] && !Main.tileSolidTop[Main.tile[tileX2, tileY2 - 2].TileType]) {
+							if (npc.direction == 1 && !Collision.SolidTiles(tileX2 - 2, tileX2 - 1, tileY2 - 5, tileY2 - 1) || npc.direction == -1 && !Collision.SolidTiles(tileX2 + 1, tileX2 + 2, tileY2 - 5, tileY2 - 1)) {
+								if (!Collision.SolidTiles(tileX2, tileX2, tileY2 - 5, tileY2 - 3)) {
 									npc.velocity.Y = -6f; npc.netUpdate = true;
-								}else{ npc.direction *= -1; npc.netUpdate = true; }
-							}else{ npc.direction *= -1; npc.netUpdate = true; }
-						}else if (Main.tile[tileX2, tileY2 - 1].nactive() && Main.tileSolid[Main.tile[tileX2, tileY2 - 1].type] && !Main.tileSolidTop[Main.tile[tileX2, tileY2 - 1].type])
-						{
-							if (npc.direction == 1 && !Collision.SolidTiles(tileX2 - 2, tileX2 - 1, tileY2 - 4, tileY2 - 1) || npc.direction == -1 && !Collision.SolidTiles(tileX2 + 1, tileX2 + 2, tileY2 - 4, tileY2 - 1))
-							{
-								if (!Collision.SolidTiles(tileX2, tileX2, tileY2 - 4, tileY2 - 2))
-								{
+								} else { npc.direction *= -1; npc.netUpdate = true; }
+							} else { npc.direction *= -1; npc.netUpdate = true; }
+						} else if (Main.tile[tileX2, tileY2 - 1].HasUnactuatedTile && Main.tileSolid[Main.tile[tileX2, tileY2 - 1].TileType] && !Main.tileSolidTop[Main.tile[tileX2, tileY2 - 1].TileType]) {
+							if (npc.direction == 1 && !Collision.SolidTiles(tileX2 - 2, tileX2 - 1, tileY2 - 4, tileY2 - 1) || npc.direction == -1 && !Collision.SolidTiles(tileX2 + 1, tileX2 + 2, tileY2 - 4, tileY2 - 1)) {
+								if (!Collision.SolidTiles(tileX2, tileX2, tileY2 - 4, tileY2 - 2)) {
 									npc.velocity.Y = -5f; npc.netUpdate = true;
-								}else{ npc.direction *= -1; npc.netUpdate = true; }
-							}else{ npc.direction *= -1; npc.netUpdate = true; }
-						}else if (npc.position.Y + npc.height - (tileY2 * 16f) > 20f)
-						{
-							if (Main.tile[tileX2, tileY2].nactive() && Main.tileSolid[(int)Main.tile[tileX2, tileY2].type] && (int)Main.tile[tileX2, tileY2].slope() == 0)
-							{
-								if (npc.direction == 1 && !Collision.SolidTiles(tileX2 - 2, tileX2, tileY2 - 3, tileY2 - 1) || npc.direction == -1 && !Collision.SolidTiles(tileX2, tileX2 + 2, tileY2 - 3, tileY2 - 1))
-								{
+								} else { npc.direction *= -1; npc.netUpdate = true; }
+							} else { npc.direction *= -1; npc.netUpdate = true; }
+						} else if (npc.position.Y + npc.height - (tileY2 * 16f) > 20f) {
+							if (Main.tile[tileX2, tileY2].HasUnactuatedTile && Main.tileSolid[(int)Main.tile[tileX2, tileY2].TileType] && (int)Main.tile[tileX2, tileY2].Slope == 0) {
+								if (npc.direction == 1 && !Collision.SolidTiles(tileX2 - 2, tileX2, tileY2 - 3, tileY2 - 1) || npc.direction == -1 && !Collision.SolidTiles(tileX2, tileX2 + 2, tileY2 - 3, tileY2 - 1)) {
 									npc.velocity.Y = -4.4f;
 									npc.netUpdate = true;
-								}else{ npc.direction *= -1; npc.netUpdate = true; }
+								} else { npc.direction *= -1; npc.netUpdate = true; }
 							}
 						}
-						try
-						{
+						try {
 							#region more denulling tiles
-							if (Main.tile[tileX2, tileY2 + 1] == null) Main.tile[tileX2, tileY2 + 1] = new Tile();
+							/*if (Main.tile[tileX2, tileY2 + 1] == null) Main.tile[tileX2, tileY2 + 1] = new Tile();
 							if (Main.tile[tileX2 - npc.direction, tileY2 + 1] == null) Main.tile[tileX2 - npc.direction, tileY2 + 1] = new Tile();
 							if (Main.tile[tileX2, tileY2 + 2] == null) Main.tile[tileX2, tileY2 + 2] = new Tile();
 							if (Main.tile[tileX2 - npc.direction, tileY2 + 2] == null) Main.tile[tileX2 - npc.direction, tileY2 + 2] = new Tile();
 							if (Main.tile[tileX2, tileY2 + 3] == null) Main.tile[tileX2, tileY2 + 3] = new Tile();
 							if (Main.tile[tileX2 - npc.direction, tileY2 + 3] == null) Main.tile[tileX2 - npc.direction, tileY2 + 3] = new Tile();
 							if (Main.tile[tileX2, tileY2 + 4] == null) Main.tile[tileX2, tileY2 + 4] = new Tile();
-							if (Main.tile[tileX2 - npc.direction, tileY2 + 4] == null) Main.tile[tileX2 - npc.direction, tileY2 + 4] = new Tile();
+							if (Main.tile[tileX2 - npc.direction, tileY2 + 4] == null) Main.tile[tileX2 - npc.direction, tileY2 + 4] = new Tile();*/
 							#endregion
-							if (!critter && npcTileX >= npc.homeTileX - 35 && npcTileX <= npc.homeTileX + 35 && (!Main.tile[tileX2, tileY2 + 1].nactive() || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 1].type]) && (!Main.tile[tileX2 - npc.direction, tileY2 + 1].active() || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 1].type]) && (!Main.tile[tileX2, tileY2 + 2].nactive() || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 2].type]) && (!Main.tile[tileX2 - npc.direction, tileY2 + 2].active() || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 2].type]) && (!Main.tile[tileX2, tileY2 + 3].nactive() || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 3].type]) && (!Main.tile[tileX2 - npc.direction, tileY2 + 3].active() || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 3].type]) && (!Main.tile[tileX2, tileY2 + 4].nactive() || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 4].type]) && (!Main.tile[tileX2 - npc.direction, tileY2 + 4].nactive() || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 4].type]))
-							{
+							if (!critter && npcTileX >= npc.homeTileX - 35 
+								&& npcTileX <= npc.homeTileX + 35 && (!Main.tile[tileX2, tileY2 + 1].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 1].TileType]) 
+								&& (!Main.tile[tileX2 - npc.direction, tileY2 + 1].HasTile || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 1].TileType]) 
+								&& (!Main.tile[tileX2, tileY2 + 2].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 2].TileType]) 
+								&& (!Main.tile[tileX2 - npc.direction, tileY2 + 2].HasTile || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 2].TileType]) 
+								&& (!Main.tile[tileX2, tileY2 + 3].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 3].TileType]) 
+								&& (!Main.tile[tileX2 - npc.direction, tileY2 + 3].HasTile || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 3].TileType]) 
+								&& (!Main.tile[tileX2, tileY2 + 4].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX2, tileY2 + 4].TileType]) 
+								&& (!Main.tile[tileX2 - npc.direction, tileY2 + 4].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX2 - npc.direction, tileY2 + 4].TileType])) {
 								npc.direction *= -1;
 								npc.velocity.X *= -1f;
 								npc.netUpdate = true;
 							}
-						}catch{ }
+						} catch{ }
 						if ((double)npc.velocity.Y < 0f) ai[2] = npc.position.X;
 					}
 					if (npc.velocity.Y < 0f && npc.wet) npc.velocity.Y *= 1.2f;
@@ -2970,8 +2828,7 @@ namespace Macrocosm {
 		 * fleeAtDay : If true, npc will flee if it becomes day.
 		 * ignoreWet : If true, npc will ignore being wet.
 		 */
-		public static void AIEater(NPC npc, ref float[] ai, float moveInterval = 0.022f, float distanceDivider = 4.2f, float bounceScalar = 0.7f, bool fleeAtDay = false, bool ignoreWet = false)
-        {
+		public static void AIEater(NPC npc, ref float[] ai, float moveInterval = 0.022f, float distanceDivider = 4.2f, float bounceScalar = 0.7f, bool fleeAtDay = false, bool ignoreWet = false) {
             if (npc.target < 0 || npc.target == (int)byte.MaxValue || Main.player[npc.target].dead){ npc.TargetClosest(true); }
 			float distX = Main.player[npc.target].Center.X;
 			float distY = Main.player[npc.target].Center.Y;
@@ -2985,12 +2842,10 @@ namespace Macrocosm {
 			float dist = (float) Math.Sqrt(distX2 * distX2 + distY2 * distY2);
 			float SpeedX1;
 			float SpeedY1;
-			if (dist == 0f)
-			{
+			if (dist == 0f) {
 				SpeedX1 = npc.velocity.X;
 				SpeedY1 = npc.velocity.Y;
-			}else
-			{
+			} else {
 				float distScalar = distanceDivider / dist;
 				SpeedX1 = distX2 * distScalar;
 				SpeedY1 = distY2 * distScalar;
@@ -3000,8 +2855,7 @@ namespace Macrocosm {
             if (ai[0] < -100f || (double)ai[0] > 100f){ npc.velocity.X += 23f / 1000f; }else{ npc.velocity.X -= 23f / 1000f; }
             if (ai[0] > 200f){ ai[0] = -200f; }
 			if (dist < 150f){	npc.velocity.X += SpeedX1 * 0.007f; npc.velocity.Y += SpeedY1 * 0.007f; }
-			if (Main.player[npc.target].dead)
-			{
+			if (Main.player[npc.target].dead) {
 				SpeedX1 = npc.direction * distanceDivider / 2f;
 				SpeedY1 = -distanceDivider / 2f;
 			}
@@ -3010,28 +2864,24 @@ namespace Macrocosm {
 			if (npc.velocity.Y < SpeedY1){ npc.velocity.Y += moveInterval; }else 
             if (npc.velocity.Y > SpeedY1){ npc.velocity.Y -= moveInterval; }
 			npc.rotation = (float) Math.Atan2((double) SpeedY1, (double) SpeedX1) - 1.57f;
-			if (npc.collideX)
-			{
+			if (npc.collideX) {
 				npc.netUpdate = true;
 				npc.velocity.X = npc.oldVelocity.X * -bounceScalar;
                 if (npc.direction == -1 && npc.velocity.X > 0f && npc.velocity.X < 2f){ npc.velocity.X = 2f; }
                 if (npc.direction == 1 && npc.velocity.X < 0f && npc.velocity.X > -2f){ npc.velocity.X = -2f; }
 			}
-			if (npc.collideY)
-			{
+			if (npc.collideY) {
 				npc.netUpdate = true;
 				npc.velocity.Y = npc.oldVelocity.Y * -bounceScalar;
                 if (npc.velocity.Y > 0f && npc.velocity.Y < 1.5f){ npc.velocity.Y = 2f; }
                 if (npc.velocity.Y < 0f && npc.velocity.Y > -1.5f){ npc.velocity.Y = -2f; }
 			}
-			if (!ignoreWet && npc.wet)
-			{
+			if (!ignoreWet && npc.wet) {
                 if(npc.velocity.Y > 0f){ npc.velocity.Y *= 0.95f; }
 				npc.velocity.Y -= 0.3f;
                 if(npc.velocity.Y < -2f){ npc.velocity.Y = -2f; }
 			}
-			if((fleeAtDay && Main.dayTime) || Main.player[npc.target].dead)
-			{
+			if((fleeAtDay && Main.dayTime) || Main.player[npc.target].dead) {
 				npc.velocity.Y -= moveInterval * 2f;
                 if (npc.timeLeft > 10){ npc.timeLeft = 10; }
 			}
@@ -3047,31 +2897,25 @@ namespace Macrocosm {
 		 * moveInterval : How much to move each tick (NOTE: very high numbers can result in the AI breaking!)
 		 * rotate : If true, rotates the npc like a Blazing Wheel.
 		 */
-		public static void AIWheel(NPC npc, ref float[] ai, float moveInterval = 6f, bool rotate = false)
-        {
-			if (ai[0] == 0f)
-			{
+		public static void AIWheel(NPC npc, ref float[] ai, float moveInterval = 6f, bool rotate = false) {
+			if (ai[0] == 0f) {
 				npc.TargetClosest(true);
 				npc.directionY = 1;
 				ai[0] = 1f;
 			}
-			if (ai[1] == 0f)
-			{
+			if (ai[1] == 0f) {
                 if (rotate){ npc.rotation += (float)(npc.direction * npc.directionY) * 0.13f; }
 				if (npc.collideY) ai[0] = 2f;
-				if (!npc.collideY && ai[0] == 2f)
-				{
+				if (!npc.collideY && ai[0] == 2f) {
 					npc.direction = -npc.direction;
 					ai[1] = 1f;
 					ai[0] = 1f;
 				}
 				if (npc.collideX){ npc.directionY = -npc.directionY; ai[1] = 1f; }
-			}else
-			{
+			} else {
                 if (rotate){ npc.rotation -= (float)(npc.direction * npc.directionY) * 0.13f; }
 				if (npc.collideX) ai[0] = 2f;
-				if (!npc.collideX && ai[0] == 2f)
-				{
+				if (!npc.collideX && ai[0] == 2f) {
 					npc.directionY = -npc.directionY;
 					ai[1] = 0f;
 					ai[0] = 1f;
@@ -3094,8 +2938,7 @@ namespace Macrocosm {
 		 * bounceScalar : scalar for how big a 'bounce' is if the npc hits a tile.
 		 * transformType : if not -1, will check if there's a wall behind the npc and if there is not, will change projectile npc to the type provided.
 		 */
-		public static void AISpider(NPC npc, ref float[] ai, bool ignoreSight = false, float moveInterval = 0.08f, float slowSpeed = 1.5f, float maxSpeed = 3f, float distanceDivider = 2f, float bounceScalar = 0.5f, int transformType = -1)
-        {
+		public static void AISpider(NPC npc, ref float[] ai, bool ignoreSight = false, float moveInterval = 0.08f, float slowSpeed = 1.5f, float maxSpeed = 3f, float distanceDivider = 2f, float bounceScalar = 0.5f, int transformType = -1) {
 			if (npc.target < 0 || npc.target == 255 || Main.player[npc.target].dead)
 				npc.TargetClosest(true);
             Vector2 npcCenter = npc.Center;
@@ -3110,24 +2953,20 @@ namespace Macrocosm {
             float dist = (float)Math.Sqrt(distX2 * distX2 + distY2 * distY2);
 			float velX;
 			float velY;
-			if (dist == 0f)
-			{
+			if (dist == 0f) {
 				velX = npc.velocity.X;
 				velY = npc.velocity.Y;
-			}else
-			{
+			} else {
 				float speedMult = distanceDivider / dist;
 				velX = distX2 * speedMult;
 				velY = distY2 * speedMult;
 			}
-			if (Main.player[npc.target].dead)
-			{
+			if (Main.player[npc.target].dead) {
 				velX = (float)npc.direction * distanceDivider / 2f;
 				velY = -distanceDivider / 2f;
 			}
 			npc.spriteDirection = -1;
-			if (!ignoreSight && !Collision.CanHit(npc.position, npc.width, npc.height, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height))
-			{
+			if (!ignoreSight && !Collision.CanHit(npc.position, npc.width, npc.height, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height)) {
 				++ai[0];
                 if (ai[0] > 0f){ npc.velocity.Y += 23f / 1000f; }else{ npc.velocity.Y -= 23f / 1000f; }
                 if (ai[0] < -100f || (double)ai[0] > 100f){ npc.velocity.X += 23f / 1000f; }else{ npc.velocity.X -= 23f / 1000f; }
@@ -3141,41 +2980,34 @@ namespace Macrocosm {
                 if (npc.velocity.X < -maxSpeed){ npc.velocity.X = -maxSpeed; }
                 if (npc.velocity.Y > maxSpeed){ npc.velocity.Y = maxSpeed; }else
                 if (npc.velocity.Y < -maxSpeed){ npc.velocity.Y = -maxSpeed; }
-			}else
-			{
-				if ((double)npc.velocity.X < (double)velX)
-				{
+			} else {
+				if ((double)npc.velocity.X < (double)velX) {
 					npc.velocity.X += moveInterval;
 					if ((double)npc.velocity.X < 0 && (double)velX > 0)
 						npc.velocity.X += moveInterval;
-				}else if ((double)npc.velocity.X > (double)velX)
-				{
+				} else if ((double)npc.velocity.X > (double)velX) {
 					npc.velocity.X -= moveInterval;
 					if ((double)npc.velocity.X > 0 && (double)velX < 0)
 						npc.velocity.X -= moveInterval;
 				}
-				if ((double)npc.velocity.Y < (double)velY)
-				{
+				if ((double)npc.velocity.Y < (double)velY) {
 					npc.velocity.Y += moveInterval;
 					if ((double)npc.velocity.Y < 0 && (double)velY > 0)
 						npc.velocity.Y += moveInterval;
-				}else if ((double)npc.velocity.Y > (double)velY)
-				{
+				} else if ((double)npc.velocity.Y > (double)velY) {
 					npc.velocity.Y -= moveInterval;
 					if ((double)npc.velocity.Y > 0 && (double)velY < 0)
 						npc.velocity.Y -= moveInterval;
 				}
 				npc.rotation = (float)Math.Atan2((double)velY, (double)velX);
 			}
-			if (npc.collideX)
-			{
+			if (npc.collideX) {
 				npc.netUpdate = true;
 				npc.velocity.X = npc.oldVelocity.X * -bounceScalar;
 				if (npc.direction == -1 && npc.velocity.X > 0f && npc.velocity.X < 2f){ npc.velocity.X = 2f; }
 				if (npc.direction == 1 && npc.velocity.X < 0f && npc.velocity.X > -2f){ npc.velocity.X = -2f; }
 			}
-			if (npc.collideY)
-			{
+			if (npc.collideY) {
 				npc.netUpdate = true;
 				npc.velocity.Y = npc.oldVelocity.Y * -bounceScalar;
 				if (npc.velocity.Y > 0f && npc.velocity.Y < 1.5f){ npc.velocity.Y = 2f; }
@@ -3183,16 +3015,13 @@ namespace Macrocosm {
 			}
 			if ((npc.velocity.X > 0f && npc.oldVelocity.X < 0f || npc.velocity.X < 0f && npc.oldVelocity.X > 0f || (npc.velocity.Y > 0f && npc.oldVelocity.Y < 0f || npc.velocity.Y < 0f && npc.oldVelocity.Y > 0f)) && !npc.justHit)
 				npc.netUpdate = true;
-			if(Main.netMode != 1 && transformType != -1)
-            {
+			if(Main.netMode != 1 && transformType != -1) {
 			    int centerTileX = (int)npc.Center.X / 16;
 			    int centerTileY = (int)npc.Center.Y / 16;
 			    bool wallExists = false;
-			    for (int x = centerTileX - 1; x <= centerTileX + 1; ++x)
-			    {
-				    for (int y = centerTileY - 1; y <= centerTileY + 1; ++y)
-				    {
-                        if (Main.tile[x, y].wall > 0) { wallExists = true; break; }
+			    for (int x = centerTileX - 1; x <= centerTileX + 1; ++x) {
+				    for (int y = centerTileY - 1; y <= centerTileY + 1; ++y) {
+                        if (Main.tile[x, y].Wall > 0) { wallExists = true; break; }
 				    }
 			    }
 			    if (!wallExists) npc.Transform(transformType);
@@ -3209,49 +3038,38 @@ namespace Macrocosm {
 		 * increment : the amount to move per tick.
 		 * closeIncrement : the amount to move per tick when close to the player.
 		 */
-		public static void AISkull(NPC npc, ref float[] ai, bool tacklePlayer = true, float maxDistanceAmt = 4f, float maxDistance = 350f, float increment = 0.011f, float closeIncrement = 0.019f)
-        {
+		public static void AISkull(NPC npc, ref float[] ai, bool tacklePlayer = true, float maxDistanceAmt = 4f, float maxDistance = 350f, float increment = 0.011f, float closeIncrement = 0.019f) {
 		    float distanceAmt = 1f;
 		    npc.TargetClosest(true);
 		    float distX = Main.player[npc.target].Center.X - npc.Center.X;
 		    float distY = Main.player[npc.target].Center.Y - npc.Center.Y;
 		    float dist = (float)Math.Sqrt((double)(distX * distX + distY * distY));
 		    ai[1] += 1f;
-		    if (ai[1] > 600f)
-		    {
-                if (tacklePlayer)
-                {
+		    if (ai[1] > 600f) {
+                if (tacklePlayer) {
                     increment *= 8f;
                     distanceAmt = 4f;
                     if (ai[1] > 650f){ ai[1] = 0f; }
-                }else{ ai[1] = 0f; }
-		    }else
-			if (dist < 250f)
-			{
+                } else { ai[1] = 0f; }
+		    } else if (dist < 250f) {
 				ai[0] += 0.9f;
                 if (ai[0] > 0f){ npc.velocity.Y = npc.velocity.Y + closeIncrement; }else{ npc.velocity.Y = npc.velocity.Y - closeIncrement; }
                 if (ai[0] < -100f || ai[0] > 100f) { npc.velocity.X = npc.velocity.X + closeIncrement; }else{ npc.velocity.X = npc.velocity.X - closeIncrement; }
 				if (ai[0] > 200f){ ai[0] = -200f; }
 			}
-		    if (dist > maxDistance)
-		    {
+		    if (dist > maxDistance) {
                 distanceAmt = maxDistanceAmt + (maxDistanceAmt / 4f);
 			    increment = 0.3f;
-		    }else
-			if (dist > maxDistance - (maxDistance / 7f))
-			{
+		    } else if (dist > maxDistance - (maxDistance / 7f)) {
                 distanceAmt = maxDistanceAmt - (maxDistanceAmt / 4f);
 				increment = 0.2f;
-			}else
-            if (dist > maxDistance - (2 * (maxDistance / 7f)))
-			{
+			}else if (dist > maxDistance - (2 * (maxDistance / 7f))) {
                 distanceAmt = (maxDistanceAmt / 2.66f);
 				increment = 0.1f;
 			}
 		    dist = distanceAmt / dist;
 		    distX *= dist; distY *= dist;
-		    if (Main.player[npc.target].dead)
-		    {
+		    if (Main.player[npc.target].dead) {
 			    distX = (float)npc.direction * distanceAmt / 2f;
 			    distY = -distanceAmt / 2f;
 		    }
@@ -3272,12 +3090,10 @@ namespace Macrocosm {
 		 * hoverMaxSpeed : the maximum speed to hover by.
 		 * hoverHeight : the amount of tiles below an npc before it needs ground to hover over.
 		 */
-		public static void AIFloater(NPC npc, ref float[] ai, bool ignoreWet = false, float moveInterval = 0.2f, float maxSpeedX = 2f, float maxSpeedY = 1.5f, float hoverInterval = 0.04f, float hoverMaxSpeed = 1.5f, int hoverHeight = 3)
-        {
+		public static void AIFloater(NPC npc, ref float[] ai, bool ignoreWet = false, float moveInterval = 0.2f, float maxSpeedX = 2f, float maxSpeedY = 1.5f, float hoverInterval = 0.04f, float hoverMaxSpeed = 1.5f, int hoverHeight = 3) {
             bool flyUpward = false;
             if (npc.justHit) { ai[2] = 0f; }
-            if (ai[2] >= 0f)
-            {
+            if (ai[2] >= 0f) {
                 int tileDist = 16;
                 bool inRangeX = false;
                 bool inRangeY = false;
@@ -3285,126 +3101,97 @@ namespace Macrocosm {
                 else
                     if ((npc.velocity.X < 0f && npc.direction > 0) || (npc.velocity.X > 0f && npc.direction < 0)) { inRangeX = true; }
                 tileDist += 24;
-                if (npc.position.Y > ai[1] - (float)tileDist && npc.position.Y < ai[1] + (float)tileDist)
-                {
+                if (npc.position.Y > ai[1] - (float)tileDist && npc.position.Y < ai[1] + (float)tileDist) {
                     inRangeY = true;
                 }
-                if (inRangeX && inRangeY)
-                {
+                if (inRangeX && inRangeY) {
                     ai[2] += 1f;
                     //i'm pretty sure projectile is never called, but it's in the original so...
-                    if (ai[2] >= 30f && tileDist == 16)
-                    {
+                    if (ai[2] >= 30f && tileDist == 16) {
                         flyUpward = true;
                     }
-                    if (ai[2] >= 60f)
-                    {
+                    if (ai[2] >= 60f) {
                         ai[2] = -200f;
                         npc.direction *= -1;
                         npc.velocity.X = npc.velocity.X * -1f;
                         npc.collideX = false;
                     }
-                }
-                else
-                {
+                } else {
                     ai[0] = npc.position.X;
                     ai[1] = npc.position.Y;
                     ai[2] = 0f;
                 }
                 npc.TargetClosest(true);
-            }
-            else
-            {
+            } else {
                 ai[2] += 1f;
-                if (Main.player[npc.target].position.X + (float)(Main.player[npc.target].width / 2) > npc.position.X + (float)(npc.width / 2))
-                {
+                if (Main.player[npc.target].position.X + (float)(Main.player[npc.target].width / 2) > npc.position.X + (float)(npc.width / 2)) {
                     npc.direction = -1;
-                }
-                else
-                {
+                } else {
                     npc.direction = 1;
                 }
             }
             int tileX = (int)(npc.Center.X / 16f) + npc.direction * 2;
             int tileY = (int)((npc.position.Y + (float)npc.height) / 16f);
             bool tileBelowEmpty = true;
-            for (int tY = tileY; tY < tileY + hoverHeight; tY++)
-            {
-                if (Main.tile[tileX, tY] == null)
-                {
+            for (int tY = tileY; tY < tileY + hoverHeight; tY++) {
+                if (Main.tile[tileX, tY] == null) {
                     Main.tile[tileX, tY] = new Tile();
                 }
-                if ((Main.tile[tileX, tY].nactive() && Main.tileSolid[(int)Main.tile[tileX, tY].type]) || Main.tile[tileX, tY].liquid > 0)
-                {
+                if ((Main.tile[tileX, tY].HasUnactuatedTile && Main.tileSolid[(int)Main.tile[tileX, tY].TileType]) || Main.tile[tileX, tY].LiquidType > 0) {
                     tileBelowEmpty = false;
                     break;
                 }
             }
-            if (flyUpward)
-            {
+            if (flyUpward) {
                 tileBelowEmpty = true;
             }
-            if (tileBelowEmpty)
-            {
+            if (tileBelowEmpty) {
                 npc.velocity.Y += moveInterval;
                 if (npc.velocity.Y > maxSpeedY) { npc.velocity.Y = maxSpeedY; }
-            }
-            else
-            {
+            } else {
                 if (npc.directionY < 0 && npc.velocity.Y > 0f) { npc.velocity.Y -= moveInterval; }
                 if (npc.velocity.Y < -maxSpeedY) { npc.velocity.Y = -maxSpeedY; }
             }
-            if (!ignoreWet && npc.wet)
-            {
+            if (!ignoreWet && npc.wet) {
                 npc.velocity.Y -= moveInterval;
                 if (npc.velocity.Y < -maxSpeedY * 0.75f) { npc.velocity.Y = -maxSpeedY * 0.75f; }
             }
-            if (npc.collideX)
-            {
+            if (npc.collideX) {
                 npc.velocity.X = npc.oldVelocity.X * -0.4f;
                 if (npc.direction == -1 && npc.velocity.X > 0f && npc.velocity.X < 1f) { npc.velocity.X = 1f; }
                 if (npc.direction == 1 && npc.velocity.X < 0f && npc.velocity.X > -1f) { npc.velocity.X = -1f; }
             }
-            if (npc.collideY)
-            {
+            if (npc.collideY) {
                 npc.velocity.Y = npc.oldVelocity.Y * -0.25f;
                 if (npc.velocity.Y > 0f && npc.velocity.Y < 1f) { npc.velocity.Y = 1f; }
                 if (npc.velocity.Y < 0f && npc.velocity.Y > -1f) { npc.velocity.Y = -1f; }
             }
-            if (npc.direction == -1 && npc.velocity.X > -maxSpeedX)
-            {
+            if (npc.direction == -1 && npc.velocity.X > -maxSpeedX) {
                 npc.velocity.X -= (moveInterval * 0.5f);
                 if (npc.velocity.X > maxSpeedX) { npc.velocity.X = npc.velocity.X - 0.1f; }
                 else
                     if (npc.velocity.X > 0f) { npc.velocity.X = npc.velocity.X + 0.05f; }
                 if (npc.velocity.X < -maxSpeedX) { npc.velocity.X = -maxSpeedX; }
+            } else if (npc.direction == 1 && npc.velocity.X < maxSpeedX) {
+                npc.velocity.X += (moveInterval * 0.5f);
+                if (npc.velocity.X < -maxSpeedX) { npc.velocity.X = npc.velocity.X + 0.1f; }
+                else
+				    if (npc.velocity.X < 0f) { npc.velocity.X = npc.velocity.X - 0.05f; }
+                if (npc.velocity.X > maxSpeedX) { npc.velocity.X = maxSpeedX; }
             }
-            else
-                if (npc.direction == 1 && npc.velocity.X < maxSpeedX)
-                {
-                    npc.velocity.X += (moveInterval * 0.5f);
-                    if (npc.velocity.X < -maxSpeedX) { npc.velocity.X = npc.velocity.X + 0.1f; }
-                    else
-                        if (npc.velocity.X < 0f) { npc.velocity.X = npc.velocity.X - 0.05f; }
-                    if (npc.velocity.X > maxSpeedX) { npc.velocity.X = maxSpeedX; }
-                }
-            if (npc.directionY == -1 && (double)npc.velocity.Y > -hoverMaxSpeed)
-            {
+            if (npc.directionY == -1 && (double)npc.velocity.Y > -hoverMaxSpeed) {
                 npc.velocity.Y = npc.velocity.Y - hoverInterval;
                 if ((double)npc.velocity.Y > hoverMaxSpeed) { npc.velocity.Y = npc.velocity.Y - 0.05f; }
                 else
                     if (npc.velocity.Y > 0f) { npc.velocity.Y = npc.velocity.Y + (hoverInterval - 0.01f); }
                 if ((double)npc.velocity.Y < -hoverMaxSpeed) { npc.velocity.Y = -hoverMaxSpeed; }
+            } else if (npc.directionY == 1 && (double)npc.velocity.Y < hoverMaxSpeed) {
+                npc.velocity.Y = npc.velocity.Y + hoverInterval;
+                if ((double)npc.velocity.Y < -hoverMaxSpeed) { npc.velocity.Y = npc.velocity.Y + 0.05f; }
+                else
+					if (npc.velocity.Y < 0f) { npc.velocity.Y = npc.velocity.Y - (hoverInterval - 0.01f); }
+				if ((double)npc.velocity.Y > hoverMaxSpeed) { npc.velocity.Y = hoverMaxSpeed; }
             }
-            else
-                if (npc.directionY == 1 && (double)npc.velocity.Y < hoverMaxSpeed)
-                {
-                    npc.velocity.Y = npc.velocity.Y + hoverInterval;
-                    if ((double)npc.velocity.Y < -hoverMaxSpeed) { npc.velocity.Y = npc.velocity.Y + 0.05f; }
-                    else
-                        if (npc.velocity.Y < 0f) { npc.velocity.Y = npc.velocity.Y - (hoverInterval - 0.01f); }
-                    if ((double)npc.velocity.Y > hoverMaxSpeed) { npc.velocity.Y = hoverMaxSpeed; }
-                }
         }
 
 		/*
@@ -3415,48 +3202,38 @@ namespace Macrocosm {
 		 * maxSpeedX/maxSpeedY : the max speed of the npc on the X and Y axis, respectively.
 		 * slowdownIncrementX/slowdownIncrementY : the slowdown increment on the X and Y axis, respectively.
 		 */
-		public static void AIFlier(NPC npc, ref float[] ai, bool sporadic = true, float moveIntervalX = 0.1f, float moveIntervalY = 0.04f, float maxSpeedX = 4f, float maxSpeedY = 1.5f, bool canBeBored = true, int timeUntilBoredom = 300)
-        {
-            if (npc.collideX)
-            {
+		public static void AIFlier(NPC npc, ref float[] ai, bool sporadic = true, float moveIntervalX = 0.1f, float moveIntervalY = 0.04f, float maxSpeedX = 4f, float maxSpeedY = 1.5f, bool canBeBored = true, int timeUntilBoredom = 300) {
+            if (npc.collideX) {
                 npc.velocity.X = npc.oldVelocity.X * -0.5f;
                 float max = maxSpeedX * 0.5f;
                 if (npc.direction == -1 && npc.velocity.X > 0f && npc.velocity.X < max) { npc.velocity.X = max; }
                 if (npc.direction == 1 && npc.velocity.X < 0f && npc.velocity.X > -max) { npc.velocity.X = -max; }
             }
-            if (npc.collideY)
-            {
+            if (npc.collideY) {
                 npc.velocity.Y = npc.oldVelocity.Y * -0.5f;
                 float max = maxSpeedY * 0.66f;
                 if (npc.velocity.Y > 0f && npc.velocity.Y < max) { npc.velocity.Y = max; }
                 if (npc.velocity.Y < 0f && npc.velocity.Y > -max) { npc.velocity.Y = -max; }
             }
             npc.TargetClosest(true);
-            Action move = () =>
-            {
-                if (npc.direction == -1 && npc.velocity.X > -maxSpeedX)
-                {
+            Action move = () => {
+                if (npc.direction == -1 && npc.velocity.X > -maxSpeedX) {
                     npc.velocity.X -= moveIntervalX;
                     if (npc.velocity.X > maxSpeedX) { npc.velocity.X -= moveIntervalX; }else
                     if (npc.velocity.X > 0f) { npc.velocity.X += moveIntervalX * 0.5f; }
                     if (npc.velocity.X < -maxSpeedX) { npc.velocity.X = -maxSpeedX; }
-                }else
-                if (npc.direction == 1 && npc.velocity.X < maxSpeedX)
-                {
+                } else if (npc.direction == 1 && npc.velocity.X < maxSpeedX) {
                     npc.velocity.X += moveIntervalX;
                     if (npc.velocity.X < -maxSpeedX) { npc.velocity.X += moveIntervalX; }else
                     if (npc.velocity.X < 0f) { npc.velocity.X -= moveIntervalX * 0.5f; }
                     if (npc.velocity.X > maxSpeedX) { npc.velocity.X = maxSpeedX; }
                 }
-                if (npc.directionY == -1 && (double)npc.velocity.Y > -maxSpeedY)
-                {
+                if (npc.directionY == -1 && (double)npc.velocity.Y > -maxSpeedY) {
                     npc.velocity.Y -= moveIntervalY;
                     if ((double)npc.velocity.Y > maxSpeedY) { npc.velocity.Y -= moveIntervalY; }else
                     if (npc.velocity.Y > 0f) { npc.velocity.Y += moveIntervalY * 0.5f; }
                     if ((double)npc.velocity.Y < -maxSpeedY) { npc.velocity.Y = -maxSpeedY; }
-                }else
-                if (npc.directionY == 1 && (double)npc.velocity.Y < maxSpeedY)
-                {
+                } else if (npc.directionY == 1 && (double)npc.velocity.Y < maxSpeedY) {
                     npc.velocity.Y += moveIntervalY;
                     if ((double)npc.velocity.Y < -maxSpeedY) { npc.velocity.Y += moveIntervalY; }else
                     if (npc.velocity.Y < 0f) { npc.velocity.Y -= moveIntervalY * 0.5f; }
@@ -3464,23 +3241,18 @@ namespace Macrocosm {
                 }
             };
             if (canBeBored){ ai[0] += 1f; }
-            if (canBeBored && ai[0] > timeUntilBoredom)
-            {
-                if (!Main.player[npc.target].wet && Collision.CanHit(npc.position, npc.width, npc.height, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height))
-                {
+            if (canBeBored && ai[0] > timeUntilBoredom) {
+                if (!Main.player[npc.target].wet && Collision.CanHit(npc.position, npc.width, npc.height, Main.player[npc.target].position, Main.player[npc.target].width, Main.player[npc.target].height)) {
                     ai[0] = 0f;
                 }
                 if (ai[0] > timeUntilBoredom * 2) { ai[0] = 0f; }
                 npc.direction = Main.player[npc.target].Center.X < npc.Center.X ? 1 : -1;
                 npc.directionY = Main.player[npc.target].Center.Y < npc.Center.Y ? 1 : -1;
                 move();
-            }else
-            {
+            } else {
                 move();
-                if (sporadic)
-                {
-                    if (npc.wet)
-                    {
+                if (sporadic) {
+                    if (npc.wet) {
                         if (npc.velocity.Y > 0f) { npc.velocity.Y = npc.velocity.Y * 0.95f; }
                         npc.velocity.Y = npc.velocity.Y - 0.5f;
                         if (npc.velocity.Y < -maxSpeedX) { npc.velocity.Y = -maxSpeedX; }
@@ -3505,21 +3277,17 @@ namespace Macrocosm {
 		 * speedMax : the max speed of the npc.
 		 * targetOffset : A vector2 representing an 'offset' from the target, allows for some variation and misaccuracy.
 		 */
-		public static void AIPlant(NPC npc, ref float[] ai, bool checkTilePoint = true, Vector2 endPoint = default(Vector2), bool isTilePos = true, float vineLength = 150f, float vineLengthLong = 200f, int vineTimeExtend = 300, int vineTimeMax = 450, float moveInterval = 0.035f, float speedMax = 2f, Vector2 targetOffset = default(Vector2))
-        {
-            if (endPoint != default(Vector2))
-            {
+		public static void AIPlant(NPC npc, ref float[] ai, bool checkTilePoint = true, Vector2 endPoint = default(Vector2), bool isTilePos = true, float vineLength = 150f, float vineLengthLong = 200f, int vineTimeExtend = 300, int vineTimeMax = 450, float moveInterval = 0.035f, float speedMax = 2f, Vector2 targetOffset = default(Vector2)) {
+            if (endPoint != default(Vector2)) {
                 ai[0] = endPoint.X;
                 ai[1] = endPoint.Y;
             }
-            if (checkTilePoint)
-            {
+            if (checkTilePoint) {
                 Vector2 tilePos = isTilePos ? new Vector2(ai[0], ai[1]) : new Vector2(ai[0] / 16f, ai[1] / 16f);
                 int tx = (int)tilePos.X; int ty = (int)tilePos.Y;
                 if (Main.tile[tx, ty] == null) { Main.tile[tx, ty] = new Tile(); }
-                if (!Main.tile[tx, ty].nactive() || (!Main.tileSolid[Main.tile[tx, ty].type] || (Main.tileSolid[Main.tile[tx, ty].type] && Main.tileSolidTop[Main.tile[tx, ty].type])))
-                {
-                    if(npc.DeathSound != null) Main.PlaySound(npc.DeathSound, (int)npc.Center.X, (int)npc.Center.Y);
+                if (!Main.tile[tx, ty].HasUnactuatedTile || (!Main.tileSolid[Main.tile[tx, ty].TileType] || (Main.tileSolid[Main.tile[tx, ty].TileType] && Main.tileSolidTop[Main.tile[tx, ty].TileType]))) {
+                    if(npc.DeathSound != null) SoundEngine.PlaySound((SoundStyle)npc.DeathSound, npc.Center);
                     npc.life = -1;
                     npc.HitEffect(0, 10.0f);
                     npc.active = false;
@@ -3528,8 +3296,7 @@ namespace Macrocosm {
             }
             npc.TargetClosest(true);
             ai[2] += 1f;
-            if (ai[2] > vineTimeExtend)
-            {
+            if (ai[2] > vineTimeExtend) {
                 vineLength = vineLengthLong;
                 if (ai[2] > vineTimeMax) { ai[2] = 0f; }
             }
@@ -3538,29 +3305,22 @@ namespace Macrocosm {
             float distPlayerX = playerCenter.X - (float)(npc.width / 2) - endPointCenter.X;
             float distPlayerY = playerCenter.Y - (float)(npc.height / 2) - endPointCenter.Y;
             float distPlayer = (float)Math.Sqrt((double)(distPlayerX * distPlayerX + distPlayerY * distPlayerY));
-            if (distPlayer > vineLength)
-            {
+            if (distPlayer > vineLength) {
                 distPlayer = vineLength / distPlayer;
                 distPlayerX *= distPlayer;
                 distPlayerY *= distPlayer;
             }
-            if (npc.position.X < endPointCenter.X + distPlayerX)
-            {
+            if (npc.position.X < endPointCenter.X + distPlayerX) {
                 npc.velocity.X = npc.velocity.X + moveInterval;
                 if (npc.velocity.X < 0f && distPlayerX > 0f) { npc.velocity.X = npc.velocity.X + moveInterval * 1.5f; }
-            }else
-            if (npc.position.X > endPointCenter.X + distPlayerX)
-            {
+            } else if (npc.position.X > endPointCenter.X + distPlayerX) {
                 npc.velocity.X = npc.velocity.X - moveInterval;
                 if (npc.velocity.X > 0f && distPlayerX < 0f) { npc.velocity.X = npc.velocity.X - moveInterval * 1.5f; }
             }
-            if (npc.position.Y < endPointCenter.Y + distPlayerY)
-            {
+            if (npc.position.Y < endPointCenter.Y + distPlayerY) {
                 npc.velocity.Y = npc.velocity.Y + moveInterval;
                 if (npc.velocity.Y < 0f && distPlayerY > 0f) { npc.velocity.Y = npc.velocity.Y + moveInterval * 1.5f; }
-            }else
-            if (npc.position.Y > endPointCenter.Y + distPlayerY)
-            {
+            } else if (npc.position.Y > endPointCenter.Y + distPlayerY) {
                 npc.velocity.Y = npc.velocity.Y - moveInterval;
                 if (npc.velocity.Y > 0f && distPlayerY < 0f) { npc.velocity.Y = npc.velocity.Y - moveInterval * 1.5f; }
             }
@@ -3568,43 +3328,36 @@ namespace Macrocosm {
             npc.velocity.Y = MathHelper.Clamp(npc.velocity.Y, -speedMax, speedMax);
             if (distPlayerX > 0f) { npc.spriteDirection = 1; npc.rotation = (float)Math.Atan2((double)distPlayerY, (double)distPlayerX); }else
             if (distPlayerX < 0f) { npc.spriteDirection = -1; npc.rotation = (float)Math.Atan2((double)distPlayerY, (double)distPlayerX) + 3.14f; }
-            if (npc.collideX)
-            {
+            if (npc.collideX) {
                 npc.netUpdate = true;
                 npc.velocity.X = npc.oldVelocity.X * -0.7f;
                 npc.velocity.X = MathHelper.Clamp(npc.velocity.X, -speedMax, speedMax);
             }
-            if (npc.collideY)
-            {
+            if (npc.collideY) {
                 npc.netUpdate = true;
                 npc.velocity.Y = npc.oldVelocity.Y * -0.7f;
                 npc.velocity.Y = MathHelper.Clamp(npc.velocity.Y, -speedMax, speedMax);
             }
         }
 
-        public static void AIWorm(NPC npc, int[] wormTypes, int wormLength = 3, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null)
-        {
+        public static void AIWorm(NPC npc, int[] wormTypes, int wormLength = 3, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null) {
 			bool diggingDummy = false;			
 			AIWorm(npc, ref diggingDummy, wormTypes, wormLength, partDistanceAddon, maxSpeed, gravityResist, fly, split, ignoreTiles, spawnTileDust, soundEffects, rotateAverage, onChangeType);
 		}
 		
-        public static void AIWorm(NPC npc, ref bool isDigging, int[] wormTypes, int wormLength = 3, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null)
-        {
+        public static void AIWorm(NPC npc, ref bool isDigging, int[] wormTypes, int wormLength = 3, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null) {
             int[] wtypes = new int[(wormTypes.Length == 1 ? 1 : wormLength)];
             wtypes[0] = wormTypes[0];
-			if (wormTypes.Length > 1)
-			{
+			if (wormTypes.Length > 1) {
 				wtypes[wtypes.Length - 1] = wormTypes[2];
-				for (int m = 1; m < wtypes.Length - 1; m++)
-				{
+				for (int m = 1; m < wtypes.Length - 1; m++) {
 					wtypes[m] = wormTypes[1];
 				}
 			}
             AIWorm(npc, ref isDigging, wtypes, partDistanceAddon, maxSpeed, gravityResist, fly, split, ignoreTiles, spawnTileDust, soundEffects, rotateAverage, onChangeType);
         }
 		
-		public static void AIWorm(NPC npc, int[] wormTypes, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null)
-        {
+		public static void AIWorm(NPC npc, int[] wormTypes, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null) {
 			bool diggingDummy = false;
 			AIWorm(npc, ref diggingDummy, wormTypes, partDistanceAddon, maxSpeed, gravityResist, fly, split, ignoreTiles, spawnTileDust, soundEffects, rotateAverage, onChangeType);
 		}
@@ -3625,45 +3378,36 @@ namespace Macrocosm {
 		 * rotateAverage : If true, takes the rotations of the the piece before and after this npc and averages them and adds to it to get a rotation. More accurate for some weirder shaped worms.
 		 * onChangeType : an Action<NPC, int, bool> which is called when the worm splits and the npc changes to a head or tail. (NPC npc, int oldType, bool isHead)
 		 */
-		public static void AIWorm(NPC npc, ref bool isDigging, int[] wormTypes, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null)
-        {
+		public static void AIWorm(NPC npc, ref bool isDigging, int[] wormTypes, float partDistanceAddon = 0f, float maxSpeed = 8f, float gravityResist = 0.07f, bool fly = false, bool split = false, bool ignoreTiles = false, bool spawnTileDust = true, bool soundEffects = true, bool rotateAverage = false, Action<NPC, int, bool> onChangeType = null) {
 			bool singlePiece = wormTypes.Length == 1;
 			bool isHead = npc.type == wormTypes[0];
 			bool isTail = npc.type == wormTypes[wormTypes.Length - 1];
 			bool isBody = !isHead && !isTail;		
             int wormLength = wormTypes.Length;
 			
-            if (split)
-            {
+            if (split) {
                 npc.realLife = -1;
-            }else
-            if (npc.ai[3] > 0f)
+            } else if (npc.ai[3] > 0f)
 				npc.realLife = (int)npc.ai[3];
 			
 			if(npc.ai[0] == -1f)
 				npc.ai[0] = npc.whoAmI;
             if (npc.target < 0 || npc.target == 255 || Main.player[npc.target].dead)
 				npc.TargetClosest(true);
-			if(isHead)
-			{
+			if(isHead) {
 				if((npc.target < 0 || npc.target == 255 || Main.player[npc.target].dead) && npc.timeLeft > 300)
 					npc.timeLeft = 300;
-			}else
-			{
+			} else {
 				npc.timeLeft = 50;
 			}
-            if (Main.netMode != 1)
-            {
-				if (!singlePiece)
-				{
+            if (Main.netMode != 1) {
+				if (!singlePiece) {
 					//spawn pieces (flying)
-					if (fly && isHead && npc.ai[0] == 0f)
-					{
+					if (fly && isHead && npc.ai[0] == 0f) {
 						npc.ai[3] = (float)npc.whoAmI;
 						npc.realLife = npc.whoAmI;
 						int npcID = npc.whoAmI;
-						for (int m = 1; m < wormLength - 1; m++)
-						{
+						for (int m = 1; m < wormLength - 1; m++) {
 							int npcType = wormTypes[m];
 							
 							float ai0 = 0;
@@ -3683,13 +3427,9 @@ namespace Macrocosm {
 							npcID = newnpcID;
 						}
 						npc.netUpdate = true;
-					}else //spawn pieces
-					if ((isHead || isBody) && npc.ai[0] == 0f)
-					{
-						if(isHead)
-						{
-							if (!split)
-							{
+					} else if ((isHead || isBody) && npc.ai[0] == 0f) { //spawn pieces
+						if (isHead) {
+							if (!split) {
 								npc.ai[3] = (float)npc.whoAmI;
 								npc.realLife = npc.whoAmI;
 							}
@@ -3702,15 +3442,11 @@ namespace Macrocosm {
 						if(split)
 							npc.ai[3] = 0f;
 						
-						if (isHead)
-						{
+						if (isHead) {
 							npc.ai[0] = (float)NPC.NewNPC((int)(npc.Center.X), (int)(npc.Center.Y), wormTypes[1], npc.whoAmI, ai0, ai1, ai2, ai3);
-						}else
-						if (isBody && npc.ai[2] > 0f)
-						{
+						} else if (isBody && npc.ai[2] > 0f) {
 							npc.ai[0] = (float)NPC.NewNPC((int)(npc.Center.X), (int)(npc.Center.Y), wormTypes[wormLength - (int)npc.ai[2]], npc.whoAmI, ai0, ai1, ai2, ai3);
-						}else
-						{
+						} else {
 							npc.ai[0] = (float)NPC.NewNPC((int)(npc.Center.X), (int)(npc.Center.Y), wormTypes[wormTypes.Length - 1], npc.whoAmI, ai0, ai1, ai2, ai3);
 						}
 						/*if (!split)
@@ -3811,7 +3547,7 @@ namespace Macrocosm {
                     for (int tY = tileY; tY < tileCenterY; tY++)
                     {
 						Tile checkTile = BaseWorldGen.GetTileSafely(tX, tY);						
-                        if (checkTile != null && ((checkTile.nactive() && (Main.tileSolid[(int)checkTile.type] || (Main.tileSolidTop[(int)checkTile.type] && checkTile.frameY == 0))) || checkTile.liquid > 64))
+                        if (checkTile != null && ((checkTile.HasUnactuatedTile && (Main.tileSolid[(int)checkTile.TileType] || (Main.tileSolidTop[(int)checkTile.TileType] && checkTile.TileFrameY == 0))) || checkTile.liquid > 64))
                         {
                             Vector2 tPos;
                             tPos.X = (float)(tX * 16);
@@ -3819,7 +3555,7 @@ namespace Macrocosm {
                             if (npc.position.X + (float)npc.width > tPos.X && npc.position.X < tPos.X + 16f && npc.position.Y + (float)npc.height > tPos.Y && npc.position.Y < tPos.Y + 16f)
                             {
                                 canMove = true;
-                                if (spawnTileDust && Main.rand.Next(100) == 0 && checkTile.nactive())
+                                if (spawnTileDust && Main.rand.Next(100) == 0 && checkTile.HasUnactuatedTile)
                                 {
                                     WorldGen.KillTile(tX, tY, true, true, false);
                                 }
@@ -4083,9 +3819,9 @@ namespace Macrocosm {
                     int tpTileY = Main.rand.Next(playerTileY - distFromPlayer, playerTileY + distFromPlayer);
                     for (int tpY = tpTileY; tpY < playerTileY + distFromPlayer; tpY++)
                     {
-                        if ((tpY < playerTileY - 4 || tpY > playerTileY + 4 || tpTileX < playerTileX - 4 || tpTileX > playerTileX + 4) && (tpY < tileY - 1 || tpY > tileY + 1 || tpTileX < tileX - 1 || tpTileX > tileX + 1) && (!checkGround || Main.tile[tpTileX, tpY].nactive()))
+                        if ((tpY < playerTileY - 4 || tpY > playerTileY + 4 || tpTileX < playerTileX - 4 || tpTileX > playerTileX + 4) && (tpY < tileY - 1 || tpY > tileY + 1 || tpTileX < tileX - 1 || tpTileX > tileX + 1) && (!checkGround || Main.tile[tpTileX, tpY].HasUnactuatedTile))
                         {
-                            if ((CanTeleportTo != null && CanTeleportTo(tpTileX, tpY)) || (!Main.tile[tpTileX, tpY - 1].lava() && (!checkGround || Main.tileSolid[(int)Main.tile[tpTileX, tpY].type]) && !Collision.SolidTiles(tpTileX - 1, tpTileX + 1, tpY - 4, tpY - 1)))
+                            if ((CanTeleportTo != null && CanTeleportTo(tpTileX, tpY)) || (!Main.tile[tpTileX, tpY - 1].lava() && (!checkGround || Main.tileSolid[(int)Main.tile[tpTileX, tpY].TileType]) && !Collision.SolidTiles(tpTileX - 1, tpTileX + 1, tpY - 4, tpY - 1)))
                             {
                                 if (attackInterval != -1) { ai[1] = 20f; }
                                 ai[2] = (float)tpTileX;
@@ -4182,7 +3918,7 @@ namespace Macrocosm {
                     }
                     if (Main.tile[tileX, tileY - 1].liquid > 128)
                     {
-                        if (Main.tile[tileX, tileY + 1].nactive() || Main.tile[tileX, tileY + 2].nactive()) { ai[0] = -1f; }
+                        if (Main.tile[tileX, tileY + 1].HasUnactuatedTile || Main.tile[tileX, tileY + 2].HasUnactuatedTile) { ai[0] = -1f; }
                     }
                     //if npc's y speed goes above max velocity, slow the npc down.
                     if (npc.velocity.Y > velMaxY || npc.velocity.Y < -velMaxY) { npc.velocity.Y *= 0.95f; }
@@ -4522,7 +4258,7 @@ namespace Macrocosm {
 				if (Main.tile[tileX, tileY - 3] == null) Main.tile[tileX, tileY - 3] = new Tile();
 				if (Main.tile[tileX, tileY + 1] == null) Main.tile[tileX, tileY + 1] = new Tile();
 				if (Main.tile[tileX - offset, tileY - 3] == null) Main.tile[tileX - offset, tileY - 3] = new Tile();
-				if ((double)(tileX * 16) < (double)pos.X + (double)codable.width && (double)(tileX * 16 + 16) > (double)pos.X && (Main.tile[tileX, tileY].nactive() && (int)Main.tile[tileX, tileY].slope() == 0 && ((int)Main.tile[tileX, tileY - 1].slope() == 0 && Main.tileSolid[(int)Main.tile[tileX, tileY].type]) && !Main.tileSolidTop[(int)Main.tile[tileX, tileY].type] || Main.tile[tileX, tileY - 1].halfBrick() && Main.tile[tileX, tileY - 1].nactive()) && ((!Main.tile[tileX, tileY - 1].nactive() || !Main.tileSolid[(int)Main.tile[tileX, tileY - 1].type] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 1].type] || Main.tile[tileX, tileY - 1].halfBrick() && (!Main.tile[tileX, tileY - 4].nactive() || !Main.tileSolid[(int)Main.tile[tileX, tileY - 4].type] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 4].type])) && ((!Main.tile[tileX, tileY - 2].nactive() || !Main.tileSolid[(int)Main.tile[tileX, tileY - 2].type] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 2].type]) && (!Main.tile[tileX, tileY - 3].nactive() || !Main.tileSolid[(int)Main.tile[tileX, tileY - 3].type] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 3].type]) && (!Main.tile[tileX - offset, tileY - 3].nactive() || !Main.tileSolid[(int)Main.tile[tileX - offset, tileY - 3].type]))))
+				if ((double)(tileX * 16) < (double)pos.X + (double)codable.width && (double)(tileX * 16 + 16) > (double)pos.X && (Main.tile[tileX, tileY].HasUnactuatedTile && (int)Main.tile[tileX, tileY].slope() == 0 && ((int)Main.tile[tileX, tileY - 1].slope() == 0 && Main.tileSolid[(int)Main.tile[tileX, tileY].TileType]) && !Main.tileSolidTop[(int)Main.tile[tileX, tileY].TileType] || Main.tile[tileX, tileY - 1].halfBrick() && Main.tile[tileX, tileY - 1].HasUnactuatedTile) && ((!Main.tile[tileX, tileY - 1].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX, tileY - 1].TileType] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 1].TileType] || Main.tile[tileX, tileY - 1].halfBrick() && (!Main.tile[tileX, tileY - 4].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX, tileY - 4].TileType] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 4].TileType])) && ((!Main.tile[tileX, tileY - 2].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX, tileY - 2].TileType] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 2].TileType]) && (!Main.tile[tileX, tileY - 3].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX, tileY - 3].TileType] || Main.tileSolidTop[(int)Main.tile[tileX, tileY - 3].TileType]) && (!Main.tile[tileX - offset, tileY - 3].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX - offset, tileY - 3].TileType]))))
 				{
 					float tileWorldY = (float)(tileY * 16);
 					if (Main.tile[tileX, tileY].halfBrick())
@@ -4590,15 +4326,15 @@ namespace Macrocosm {
 						Tile tileNear = Main.tile[Math.Min(Main.maxTilesX, tileX - direction), y];
 						if (tile == null) { tile = Main.tile[tileX, y] = new Tile(); }
 						if (tileNear == null) { tileNear = Main.tile[Math.Min(Main.maxTilesX, tileX - direction), y] = new Tile(); }
-						if (tile.nactive() && (y != tileY || (!tile.halfBrick() && tile.slope() == 0)) && Main.tileSolid[tile.type] && (jumpUpPlatforms || !Main.tileSolidTop[tile.type]))
+						if (tile.HasUnactuatedTile && (y != tileY || (!tile.halfBrick() && tile.slope() == 0)) && Main.tileSolid[tile.TileType] && (jumpUpPlatforms || !Main.tileSolidTop[tile.TileType]))
 						{
-							if (!Main.tileSolidTop[tile.type])
+							if (!Main.tileSolidTop[tile.TileType])
 							{
 								Rectangle tileHitbox = new Rectangle(tileX * 16, y * 16, 16, 16);
 								tileHitbox.Y = hitbox.Y;
 								if (tileHitbox.Intersects(hitbox)) { newVelocity = velocity; break; }
 							}			
-							if (tileNear.nactive() && Main.tileSolid[tileNear.type] && !Main.tileSolidTop[tileNear.type]){ newVelocity = velocity; break; }
+							if (tileNear.HasUnactuatedTile && Main.tileSolid[tileNear.TileType] && !Main.tileSolidTop[tileNear.TileType]){ newVelocity = velocity; break; }
 							if (target != null && y * 16 < target.Center.Y){ continue; }								
 							lastY = y;
 							newVelocity.Y = -(5f + (float)(tileY - y) * (tileY - y > 3 ? 1f - ((tileY - y - 2) * 0.0525f) : 1f));
@@ -4613,9 +4349,9 @@ namespace Macrocosm {
                     if (Main.tile[tileX + direction, tileY + 1] == null) { Main.tile[tileX, tileY + 1] = new Tile(); }
 					if (Main.tile[tileX + direction, tileY + 2] == null) { Main.tile[tileX, tileY + 2] = new Tile(); }
                     //...and there's a gap in front of the npc, attempt to jump across it.
-                    if (directionY < 0 && (!Main.tile[tileX, tileY + 1].nactive() || !Main.tileSolid[(int)Main.tile[tileX, tileY + 1].type]) && (!Main.tile[tileX + direction, tileY + 1].nactive() || !Main.tileSolid[(int)Main.tile[tileX + direction, tileY + 1].type]))
+                    if (directionY < 0 && (!Main.tile[tileX, tileY + 1].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX, tileY + 1].TileType]) && (!Main.tile[tileX + direction, tileY + 1].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX + direction, tileY + 1].TileType]))
                     {
-						if (!Main.tile[tileX + direction, tileY + 2].nactive() || !Main.tileSolid[(int)Main.tile[tileX, tileY + 2].type] || (target == null || ((target.Center.Y + (target.height * 0.25f)) < tileY * 16f)))
+						if (!Main.tile[tileX + direction, tileY + 2].HasUnactuatedTile || !Main.tileSolid[(int)Main.tile[tileX, tileY + 2].TileType] || (target == null || ((target.Center.Y + (target.height * 0.25f)) < tileY * 16f)))
 						{
 							newVelocity.Y = -8f;
 							newVelocity.X *= 1.5f * (1f / maxSpeedX);
@@ -4625,7 +4361,7 @@ namespace Macrocosm {
 								{
 									Tile tile = Main.tile[x, tileY + 1];
 									if (tile == null) { tile = Main.tile[x, tileY + 1] = new Tile(); }
-									if (x != tileX && !tile.nactive())
+									if (x != tileX && !tile.HasUnactuatedTile)
 									{
 										newVelocity.Y -= 0.0325f;
 										newVelocity.X += direction * 0.255f;
@@ -4638,7 +4374,7 @@ namespace Macrocosm {
 								{
 									Tile tile = Main.tile[x, tileY + 1];
 									if (tile == null) { tile = Main.tile[x, tileY + 1] = new Tile(); }
-									if (x != tileItX && !tile.nactive())
+									if (x != tileItX && !tile.HasUnactuatedTile)
 									{
 										newVelocity.Y -= 0.0325f;
 										newVelocity.X += direction * 0.255f;
@@ -4681,7 +4417,7 @@ namespace Macrocosm {
                         if (m == -1 && Main.tile[tileX + npc.direction, tileY + m] == null) { Main.tile[tileX + npc.direction, tileY + m] = new Tile(); }
                     if (Main.tile[tileX, tileY + m] == null) { Main.tile[tileX, tileY + m] = new Tile(); }
                 }
-                if (Main.tile[tileX, tileY - 1].nactive() && Main.tile[tileX, tileY - 1].type == 10)
+                if (Main.tile[tileX, tileY - 1].HasUnactuatedTile && Main.tile[tileX, tileY - 1].type == 10)
                 {
                     doorCounter += 1f;
                     tickUpdater = 0f;
@@ -4705,7 +4441,7 @@ namespace Macrocosm {
                                 if (interactDoorStyle == 1)
                                 {
                                     WorldGen.KillTile(tileX, tileY);
-                                    openedDoor = !Main.tile[tileX, tileY].nactive();
+                                    openedDoor = !Main.tile[tileX, tileY].HasUnactuatedTile;
                                 }
                                 else
                                 {
@@ -5625,15 +5361,13 @@ namespace Macrocosm {
          *             2 -> hurt BOTH Players/Townies and NPCs
          *             3 -> hurt NEITHER Players/Townies and NPCs (inert projectile)
          */
-        public static int FireProjectile(Vector2 fireTarget, Vector2 position, int projectileType, int damage, float knockback, float speedScalar = 1f, int hostility = 0, int owner = -1, Vector2 targetOffset = default(Vector2))
-        {
+        public static int FireProjectile(Vector2 fireTarget, Vector2 position, int projectileType, int damage, float knockback, float speedScalar = 1f, int hostility = 0, int owner = -1, Vector2 targetOffset = default(Vector2)) {
             Vector2 rotVec = BaseUtility.RotateVector(position, position + new Vector2(speedScalar, 0f), BaseUtility.RotationTo(position, fireTarget));
             rotVec -= position;
-            int projectileID = Projectile.NewProjectile(position.X, position.Y, rotVec.X, rotVec.Y, projectileType, damage, knockback, (owner != -1 ? owner : Main.myPlayer));
+            int projectileID = Projectile.NewProjectile(null, position.X, position.Y, rotVec.X, rotVec.Y, projectileType, damage, knockback, (owner != -1 ? owner : Main.myPlayer));
             Projectile proj = Main.projectile[projectileID];
 			proj.velocity = rotVec;
-            if (hostility != 0)
-            {
+            if (hostility != 0) {
 				proj.friendly = (hostility == 1 || hostility == 2);
 				proj.hostile = (hostility == -1 || hostility == 2);
 				if (Main.netMode != 0) { MNet.SendBaseNetMessage(0, proj.owner, proj.identity, proj.friendly, proj.hostile); }
@@ -5644,12 +5378,10 @@ namespace Macrocosm {
         }
 
 
-        public static void Look(Projectile p, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false)
-        {
+        public static void Look(Projectile p, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false) {
             Look(p, ref p.rotation, ref p.spriteDirection, lookType, rotAddon, rotAmount, flipSpriteDir);
         }
-        public static void Look(NPC npc, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false)
-        {
+        public static void Look(NPC npc, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false) {
             Look(npc, ref npc.rotation, ref npc.spriteDirection, lookType, rotAddon, rotAmount, flipSpriteDir);
         }
         /*
@@ -5663,23 +5395,18 @@ namespace Macrocosm {
          * rotAddon : the amount to add to the rotation. (only used by lookType 3/4)
          * rotAmount: the amount to rotate by. (only used by lookType 3/4)
          */
-        public static void Look(Entity c, ref float rotation, ref int spriteDirection, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false)
-        {
+        public static void Look(Entity c, ref float rotation, ref int spriteDirection, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false) {
             LookAt(c.position + c.velocity, c.position, ref rotation, ref spriteDirection, lookType, rotAddon, rotAmount, flipSpriteDir);
         }
 
-        public static void LookAt(Vector2 lookTarget, Entity c, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false)
-        {
+        public static void LookAt(Vector2 lookTarget, Entity c, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false) {
             int spriteDirection = (c is NPC ? ((NPC)c).spriteDirection : c is Projectile ? ((Projectile)c).spriteDirection : 0);
             float rotation = (c is NPC ? ((NPC)c).rotation : c is Projectile ? ((Projectile)c).rotation : 0f);
             LookAt(lookTarget, c.Center, ref rotation, ref spriteDirection, lookType, rotAddon, rotAmount, flipSpriteDir);
-            if (c is NPC)
-            {
+            if (c is NPC) {
                 ((NPC)c).spriteDirection = spriteDirection;
                 ((NPC)c).rotation = rotation;
-            }else
-            if (c is Projectile)
-            {
+            } else if (c is Projectile) {
                 ((Projectile)c).spriteDirection = spriteDirection;
                 ((Projectile)c).rotation = rotation;
             }
@@ -5696,35 +5423,26 @@ namespace Macrocosm {
          * rotAddon : the amount to add to the rotation. (only used by lookType 3/4)
          * rotAmount: the amount to rotate by. (only used by lookType 3/4)
          */
-        public static void LookAt(Vector2 lookTarget, Vector2 center, ref float rotation, ref int spriteDirection, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.075f, bool flipSpriteDir = false)
-        {
-            if (lookType == 0)
-            {
+        public static void LookAt(Vector2 lookTarget, Vector2 center, ref float rotation, ref int spriteDirection, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.075f, bool flipSpriteDir = false) {
+            if (lookType == 0) {
                 if (lookTarget.X > center.X) { spriteDirection = -1; } else { spriteDirection = 1; }
                 if (flipSpriteDir) { spriteDirection *= -1; }
                 float rotX = lookTarget.X - center.X;
                 float rotY = lookTarget.Y - center.Y;
                 rotation = -((float)Math.Atan2((double)rotX, (double)rotY) - 1.57f + rotAddon);
                 if (spriteDirection == 1) { rotation -= (float)Math.PI; }
-            }else
-            if (lookType == 1)
-            {
+            } else if (lookType == 1) {
                 if (lookTarget.X > center.X) { spriteDirection = -1; } else { spriteDirection = 1; }
                 if (flipSpriteDir) { spriteDirection *= -1; }
-            }else
-            if (lookType == 2)
-            {
+            } else if (lookType == 2) {
                 float rotX = lookTarget.X - center.X;
                 float rotY = lookTarget.Y - center.Y;
                 rotation = -((float)Math.Atan2((double)rotX, (double)rotY) - 1.57f + rotAddon);
-            }else
-			if (lookType == 3 || lookType == 4)
-			{
+            } else if (lookType == 3 || lookType == 4) {
 				int oldDirection = spriteDirection;
 				if (lookType == 3 && lookTarget.X > center.X) { spriteDirection = -1; } else { spriteDirection = 1; }
 				if (lookType == 3 && flipSpriteDir) { spriteDirection *= -1; }
-				if (oldDirection != spriteDirection)
-				{
+				if (oldDirection != spriteDirection) {
 					rotation += (float)Math.PI * spriteDirection;
 				}
 				float pi2 = (float)Math.PI * 2f;
@@ -5734,12 +5452,9 @@ namespace Macrocosm {
 				if (spriteDirection == 1) { rot += (float)Math.PI; }
 				if (rot > pi2) { rot -= pi2; } else if (rot < 0) { rot += pi2; }
 				if (rotation > pi2) { rotation -= pi2; } else if (rotation < 0) { rotation += pi2; }
-				if (rotation < rot)
-				{
+				if (rotation < rot) {
 					if ((double)(rot - rotation) > (float)Math.PI) { rotation -= rotAmount; } else { rotation += rotAmount; }
-				}else
-				if (rotation > rot)
-				{
+				} else if (rotation > rot) {
 					if ((double)(rotation - rot) > (float)Math.PI) { rotation += rotAmount; } else { rotation -= rotAmount; }
 				}
 				if (rotation > rot - rotAmount && rotation < rot + rotAmount) { rotation = rot; }
@@ -5839,7 +5554,8 @@ namespace Macrocosm {
                         Rectangle npcRect = new Rectangle((int)npc.position.X, (int)npc.position.Y, (int)npc.width, (int)npc.height);
                         if (posRect.Intersects(npcRect)) { return returnCenter ? npc.Center : v; }
                     }
-                } if (playerCheck) {
+                } 
+				if (playerCheck) {
                     int[] players = GetPlayers(v, 5F);
                     for (int i = 0; i < players.Length; i++) {
                         Player player = Main.player[players[i]];
