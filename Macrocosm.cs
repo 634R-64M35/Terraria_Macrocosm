@@ -15,15 +15,24 @@ namespace Macrocosm {
         public override void Load() {
             Content.NPCs.GlobalNPCs.LowGravityNPC.DetourNPCGravity();
             Common.Drawing.EarthDrawing.InitializeDetour();
+            Common.Drawing.RemoveBackgroundAmbient.InitializeDetour();
             On.Terraria.UI.ItemSlot.PickItemMovementAction += MoonCoin_AllowCoinSlotPlacement;
             CurrencyManager.LoadCurrencies();
             if (!Main.dedServ)
                 LoadMoonSky();
+            
+            try
+            {
+                var ta = ModLoader.GetMod("TerrariaAmbience");
+                var taAPI = ModLoader.GetMod("TerrariaAmbienceAPI");
+                ta?.Call("AddTilesToList", this, "Stone", new string[] { "Regolith", "RegolithBrick", "Hemostone" }, null); // ech
+                taAPI?.Call(this, "Sounds/Ambient/Moon", "MoonAmbience", 1f, 0.0075f, new Func<bool>(SubworldSystem.IsActive<Moon>));
+            }
+            catch (Exception e)
+            {
+                Logger.Warn(e.Message + " Failed to load TerrariaAmbience. ");
+            }
 
-            var ta = ModLoader.GetMod("TerrariaAmbience");
-            var taAPI = ModLoader.GetMod("TerrariaAmbienceAPI");
-            ta?.Call("AddTilesToList", this, "Stone", new string[] { "Regolith", "RegolithBrick", "Hemostone" }, null); // ech
-            taAPI?.Call(this, "Sounds/Ambient/Moon", "MoonAmbience", 1f, 0.0075f, new Func<bool>(SubworldSystem.IsActive<Moon>));
         }
 
         private int MoonCoin_AllowCoinSlotPlacement(On.Terraria.UI.ItemSlot.orig_PickItemMovementAction orig, Item[] inv, int context, int slot, Item checkItem) {
@@ -33,6 +42,7 @@ namespace Macrocosm {
                 return orig(inv, context, slot, checkItem);
             }
         }
+
         private void LoadMoonSky() {
             MoonSky moonSky = new MoonSky();
             Filters.Scene["Macrocosm:MoonSky"] = new Filter(new ScreenShaderData("FilterMiniTower").UseColor(0f, 0f, 0f).UseOpacity(0f), EffectPriority.High);

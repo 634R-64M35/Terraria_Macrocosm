@@ -209,14 +209,14 @@ namespace Macrocosm.Content.Subworlds.Moon
                                     {
                                         if (!WorldGen.SolidTile(tileX - 1, tileY) && !Main.tile[tileX - 1, tileY + 1].IsHalfBlock && WorldGen.SolidTile(tileX - 1, tileY + 1) && WorldGen.SolidTile(tileX + 1, tileY) && !Main.tile[tileX + 1, tileY - 1].HasTile)
                                         {
-                                            if (WorldGen.genRand.Next(2) == 0)
+                                            if (WorldGen.genRand.NextBool(2))
                                                 WorldGen.SlopeTile(tileX, tileY, 2);
                                             else
                                                 WorldGen.PoundTile(tileX, tileY);
                                         }
                                         else if (!WorldGen.SolidTile(tileX + 1, tileY) && !Main.tile[tileX + 1, tileY + 1].IsHalfBlock && WorldGen.SolidTile(tileX + 1, tileY + 1) && WorldGen.SolidTile(tileX - 1, tileY) && !Main.tile[tileX - 1, tileY - 1].HasTile)
                                         {
-                                            if (WorldGen.genRand.Next(2) == 0)
+                                            if (WorldGen.genRand.NextBool(2))
                                                 WorldGen.SlopeTile(tileX, tileY, 1);
                                             else
                                                 WorldGen.PoundTile(tileX, tileY);
@@ -238,18 +238,18 @@ namespace Macrocosm.Content.Subworlds.Moon
                                             }
                                             else if (!Main.tile[tileX - 1, tileY + 1].HasTile && !Main.tile[tileX - 1, tileY].HasTile && WorldGen.SolidTile(tileX + 1, tileY) && WorldGen.SolidTile(tileX, tileY + 2))
                                             {
-                                                if (WorldGen.genRand.Next(5) == 0)
+                                                if (WorldGen.genRand.NextBool(5))
                                                     WorldGen.KillTile(tileX, tileY);
-                                                else if (WorldGen.genRand.Next(5) == 0)
+                                                else if (WorldGen.genRand.NextBool(5))
                                                     WorldGen.PoundTile(tileX, tileY);
                                                 else
                                                     WorldGen.SlopeTile(tileX, tileY, 2);
                                             }
                                             else if (!Main.tile[tileX + 1, tileY + 1].HasTile && !Main.tile[tileX + 1, tileY].HasTile && WorldGen.SolidTile(tileX - 1, tileY) && WorldGen.SolidTile(tileX, tileY + 2))
                                             {
-                                                if (WorldGen.genRand.Next(5) == 0)
+                                                if (WorldGen.genRand.NextBool(5))
                                                     WorldGen.KillTile(tileX, tileY);
-                                                else if (WorldGen.genRand.Next(5) == 0)
+                                                else if (WorldGen.genRand.NextBool(5))
                                                     WorldGen.PoundTile(tileX, tileY);
                                                 else
                                                     WorldGen.SlopeTile(tileX, tileY, 1);
@@ -351,7 +351,9 @@ namespace Macrocosm.Content.Subworlds.Moon
                     {
                         if (regolithChance > 0.1)
                         {
-                            Main.tile[tileX, tileY].TileType = (ushort)ModContent.TileType<Tiles.Regolith>();
+                            //Main.tile[tileX, tileY].TileType = (ushort)ModContent.TileType<Tiles.Regolith>();
+                           Main.tile[tileX, tileY].ClearTile();
+                           WorldGen.PlaceTile(tileX, tileY, (ushort)ModContent.TileType<Tiles.Regolith>());
                         }
                         regolithChance -= 0.02f;
                         if (regolithChance <= 0) break;
@@ -380,6 +382,7 @@ namespace Macrocosm.Content.Subworlds.Moon
                 }
             }
         }
+        
         private void GroundPass(GenerationProgress progress)
         {
             progress.Message = "Landing on the Moon...";
@@ -397,8 +400,10 @@ namespace Macrocosm.Content.Subworlds.Moon
                 progress.Set((i / (float)Main.maxTilesX - 1)); // Controls the progress bar, should only be set between 0f and 1f
                 for (int j = surfaceHeight; j < subworld.Height; j++)
                 {
-                    // Main.tile[i, j].active(true);  - probably no longer needed 
-                    Main.tile[i, j].TileType = (ushort)ModContent.TileType<Tiles.Protolith>();
+                    //Main.tile[i, j].active(true);
+                    //Main.tile[i, j].TileType = (ushort)ModContent.TileType<Tiles.Protolith>();
+
+                    WorldGen.PlaceTile(i, j, (ushort)ModContent.TileType<Tiles.Protolith>());
                 }
 
                 if (WorldGen.genRand.Next(0, 10) == 0) // Not much deviation here
@@ -440,6 +445,16 @@ namespace Macrocosm.Content.Subworlds.Moon
             OrePass(progress);
             CavePass(progress);
             ScuffedSmoothPass(progress);
+
+            Main.spawnTileX = 1000;
+            for (int tileY = 0; tileY < Main.maxTilesY; tileY++)
+            {
+                if (Main.tile[1000, tileY].HasTile)
+                {
+                    Main.spawnTileY = tileY;
+                    break;
+                }
+            }
         }
     }
 }

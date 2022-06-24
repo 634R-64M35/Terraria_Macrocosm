@@ -4,6 +4,7 @@ using SubworldLibrary;
 using Terraria.WorldBuilding;
 using Terraria.ModLoader;
 using Terraria.UI;
+using Terraria.Graphics.Effects;
 
 namespace Macrocosm.Content.Subworlds.Moon
 {
@@ -14,6 +15,7 @@ namespace Macrocosm.Content.Subworlds.Moon
     /// </summary>
     public class Moon : Subworld
     {
+        
         public override int Width => 2000;
         public override int Height => 1200; // 200 tile padding for the hell-layer.
         public override bool ShouldSave => true;
@@ -22,10 +24,22 @@ namespace Macrocosm.Content.Subworlds.Moon
         {
             new MoonGen("LoadingMoon", 1f, this)
         };
-        
+
         //public override UIState loadingUIState => new MoonSubworldLoadUI();
         //public override ModWorld modWorld => null;
         //public override bool saveModData => true;
+
+
+        public override void OnEnter()
+        {
+            SkyManager.Instance.Activate("Macrocosm:MoonSky");
+        }
+
+        public override void OnExit()
+        {
+            SkyManager.Instance.Deactivate("Macrocosm:MoonSky");
+        }
+
 
         public override void Load()
         {
@@ -33,15 +47,6 @@ namespace Macrocosm.Content.Subworlds.Moon
             SubworldSystem.hideUnderworld = true;
             SubworldSystem.noReturn = true;
             Main.dayTime = true;
-            Main.spawnTileX = 1000;
-            for (int tileY = 0; tileY < Main.maxTilesY; tileY++)
-            {
-                if (Main.tile[1000, tileY].HasTile)
-                {
-                    Main.spawnTileY = tileY;
-                    break;
-                }
-            }
             Main.numClouds = 0;
         }
     }

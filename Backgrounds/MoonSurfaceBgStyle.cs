@@ -36,15 +36,15 @@ namespace Macrocosm.Backgrounds {
         }
 
         public override int ChooseCloseTexture(ref float scale, ref double parallax, ref float a, ref float b) {
-            return BackgroundTextureLoader.GetBackgroundSlot("Terraria_Macrocosm/Backgrounds/MoonSurfaceMid");
+            return BackgroundTextureLoader.GetBackgroundSlot("Macrocosm/Backgrounds/MoonSurfaceMid");
         }
         public override bool PreDrawCloseBackground(SpriteBatch spriteBatch) {
             float a = 1300f;
             float b = 1750f;
             int[] textureSlots = new int[] {
-                BackgroundTextureLoader.GetBackgroundSlot("Terraria_Macrocosm/Backgrounds/MoonSurfaceFar"),
-                BackgroundTextureLoader.GetBackgroundSlot("Terraria_Macrocosm/Backgrounds/MoonSurfaceMid"),
-                BackgroundTextureLoader.GetBackgroundSlot("Terraria_Macrocosm/Backgrounds/MoonSurfaceNear"),
+                BackgroundTextureLoader.GetBackgroundSlot("Macrocosm/Backgrounds/MoonSurfaceFar"),
+                BackgroundTextureLoader.GetBackgroundSlot("Macrocosm/Backgrounds/MoonSurfaceMid"),
+                BackgroundTextureLoader.GetBackgroundSlot("Macrocosm/Backgrounds/MoonSurfaceNear"),
             };
             int length = textureSlots.Length;
             for (int i = 0; i < textureSlots.Length; i++) {
@@ -62,7 +62,8 @@ namespace Macrocosm.Backgrounds {
                 if (Main.gameMenu) {
                     bgTop = 320;
                 }
-                Color backColor = typeof(Main).GetFieldValue<Color>("backColor", Main.instance);
+                //Color backColor = typeof(Main).GetFieldValue<Color>("backColor", Main.instance);
+                Color backColor = typeof(Main).GetFieldValue<Color>("ColorOfSurfaceBackgroundsBase", Main.instance);
                 int bgLoops = Main.screenWidth / bgW + 2;
                 if (Main.screenPosition.Y < Main.worldSurface * 16.0 + 16.0) {
                     for (int k = 0; k < bgLoops; k++) {
@@ -72,6 +73,7 @@ namespace Macrocosm.Backgrounds {
                             backColor, 0f, default, bgScale, SpriteEffects.None, 0f);
                     }
                 }
+            
             }
             return false;
         }
