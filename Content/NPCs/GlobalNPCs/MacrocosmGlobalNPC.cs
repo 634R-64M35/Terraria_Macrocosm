@@ -13,24 +13,17 @@ using Terraria.GameContent.Bestiary;
 namespace Macrocosm.NPCs.GlobalNPCs {
     public class MacrocosmGlobalNPC : GlobalNPC { 
 
-        public override void ModifyNPCLoot(NPC npc, NPCLoot npcLoot)
-        {
-            if (EnemyCategorization.MoonEnemies.Contains(npc.type))
-            {
+        public override void ModifyNPCLoot(NPC npc, NPCLoot npcLoot) {
+            if (EnemyCategorization.MoonEnemies.Contains(npc.type)) {
                 npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<MoonCoin>(), 10));
             }
         }
 
 
-        public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
-        {
-
-            if (SubworldSystem.IsActive<Moon>())
-            {
-                for (int id = 0; id < NPCLoader.NPCCount; id++)
-                {
-                    if (!EnemyCategorization.MoonEnemies.Contains(id))
-                    {
+        public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo) {
+            if (SubworldSystem.IsActive<Moon>()) {
+                for (int id = 0; id < NPCLoader.NPCCount; id++) {
+                    if (!EnemyCategorization.MoonEnemies.Contains(id)) {
                         pool.Remove(id);
                     }
                 }

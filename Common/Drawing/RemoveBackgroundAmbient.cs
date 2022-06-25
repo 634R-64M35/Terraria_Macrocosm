@@ -12,8 +12,7 @@ namespace Macrocosm.Common.Drawing {
             On.Terraria.GameContent.Ambience.AmbienceServer.Update += DisableAmbienceOnMoon;
         }
 
-        private static void DisableAmbienceOnMoon(On.Terraria.GameContent.Ambience.AmbienceServer.orig_Update orig, AmbienceServer self)
-        {
+        private static void DisableAmbienceOnMoon(On.Terraria.GameContent.Ambience.AmbienceServer.orig_Update orig, AmbienceServer self) {
             if (SubworldSystem.AnyActive<Macrocosm>()) 
                 return;
 

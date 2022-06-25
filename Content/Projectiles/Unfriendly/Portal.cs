@@ -63,8 +63,7 @@ namespace Macrocosm.Content.Projectiles.Unfriendly{
 		public override Color? GetAlpha(Color lightColor)
 			=> Color.White * (1f - Projectile.alpha / 255f);
 
-		public override bool PreDraw(ref Color lightColor)
-		{
+		public override bool PreDraw(ref Color lightColor) {
 			Texture2D texture2D = TextureAssets.Projectile[Projectile.type].Value;
 			Color value = GetAlpha(lightColor) ?? Color.White;
 			Main.EntitySpriteDraw(texture2D, Projectile.Center - Main.screenPosition, null, value * 0.4f, (0f - Projectile.rotation) * 0.65f, texture2D.Size() / 2f, 

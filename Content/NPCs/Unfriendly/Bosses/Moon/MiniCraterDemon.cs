@@ -55,10 +55,8 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Bosses.Moon {
 			SpawnModBiomes = new int[1] { ModContent.GetInstance<MoonBiome>().Type }; // Associates this NPC with the Moon Biome in Bestiary
 		}
 
-		public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-		{
-			bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-			{
+		public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
+			bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
 				new FlavorTextBestiaryInfoElement(
 					"Smaller companions of the infamous Crater Demon, these lesser demons aid their master in combat.")
 			});
@@ -69,7 +67,7 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Bosses.Moon {
 		}
 
 		public override void OnHitPlayer(Player target, int damage, bool crit) {
-			if(Main.expertMode)
+			if (Main.expertMode)
 				target.GetModPlayer<MacrocosmPlayer>().accMoonArmorDebuff = 80;
 		}
 

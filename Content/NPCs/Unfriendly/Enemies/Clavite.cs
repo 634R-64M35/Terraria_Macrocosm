@@ -9,13 +9,13 @@ using Macrocosm.Content.Items.Materials;
 using Terraria.GameContent.Bestiary;
 using Macrocosm.Content.Biomes;
 
-namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
-{
+namespace Macrocosm.Content.NPCs.Unfriendly.Enemies {
     public class Clavite : ModNPC {
         public override void SetStaticDefaults() {
             DisplayName.SetDefault("Clavite");
             Main.npcFrameCount[NPC.type] = Main.npcFrameCount[NPCID.MeteorHead];
         }
+
         public override void SetDefaults() {
             NPC.width = 60;
             NPC.height = 60;
@@ -34,10 +34,8 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
             //BannerItem = Item.BannerToItem(Banner);
         }
 
-        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
-        {
-            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[]
-            {
+        public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry) {
+            bestiaryEntry.Info.AddRange(new IBestiaryInfoElement[] {
                 new FlavorTextBestiaryInfoElement(
                     "A ravenous alien that prowls the surface of the Moon, attacking and charging at anything it finds.")
             });
@@ -76,13 +74,11 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
                 player.AddBuff(ModContent.BuffType<SuitBreach>(), 600, true);
             }
         }
-        public override float SpawnChance(NPCSpawnInfo spawnInfo)
-        {
+        public override float SpawnChance(NPCSpawnInfo spawnInfo) {
             return (spawnInfo.Player.GetModPlayer<MacrocosmPlayer>().ZoneMoon && Main.dayTime) ? .1f : 0f;
         }
         
-        public override void ModifyNPCLoot(NPCLoot loot)
-        {
+        public override void ModifyNPCLoot(NPCLoot loot) {
             loot.Add(ItemDropRule.Common(ModContent.ItemType<CosmicDust>()));             // Always drop 1 cosmic dust
             loot.Add(ItemDropRule.Common(ModContent.ItemType<ArtemiteOre>(), 16, 1, 6));  // 1/16 chance to drop 1-6 Artemite Ore
             loot.Add(ItemDropRule.Common(ModContent.ItemType<ChandriumOre>(), 16, 1, 6)); // 1/16 chance to drop 1-6 Chandrium Ore
@@ -90,10 +86,8 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
             loot.Add(ItemDropRule.Common(ModContent.ItemType<DianiteOre>(), 16, 1, 6));   // 1/16 chance to drop 1-6 DianiteOre Ore
         }
 
-        public override void HitEffect(int hitDirection, double damage)
-        {
-            for (int i = 0; i < 10; i++)
-            {
+        public override void HitEffect(int hitDirection, double damage) {
+            for (int i = 0; i < 10; i++) {
                 int dustIndex = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Stone);
                 Dust dust = Main.dust[dustIndex];
                 dust.velocity.X *= dust.velocity.X * 1.25f * hitDirection + Main.rand.Next(0, 100) * 0.015f;
@@ -101,13 +95,11 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
                 dust.scale *= 1f + Main.rand.Next(-30, 31) * 0.01f;
             }
 
-            if(Main.netMode == NetmodeID.Server)
-            {
+            if(Main.netMode == NetmodeID.Server) {
                 return; // don't run on the server
             }
 
-            if(NPC.life <= 0)
-            {
+            if(NPC.life <= 0) {
                 var entitySource = NPC.GetSource_Death();
 
                 Gore.NewGore(entitySource, NPC.position, -NPC.velocity, Mod.Find<ModGore>("ClaviteGoreHead1").Type);
@@ -124,19 +116,14 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
         // The only leftover reference from BaseMod 
         // TODO: maybe remove when we rework Clavite AI - Feldy 
         
-        public static void LookAt(Vector2 lookTarget, Entity c, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false)
-        {
+        public static void LookAt(Vector2 lookTarget, Entity c, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.1f, bool flipSpriteDir = false) {
             int spriteDirection = (c is NPC ? ((NPC)c).spriteDirection : c is Projectile ? ((Projectile)c).spriteDirection : 0);
             float rotation = (c is NPC ? ((NPC)c).rotation : c is Projectile ? ((Projectile)c).rotation : 0f);
             LookAt(lookTarget, c.Center, ref rotation, ref spriteDirection, lookType, rotAddon, rotAmount, flipSpriteDir);
-            if (c is NPC)
-            {
+            if (c is NPC) {
                 ((NPC)c).spriteDirection = spriteDirection;
                 ((NPC)c).rotation = rotation;
-            }
-            else
-            if (c is Projectile)
-            {
+            } else if (c is Projectile) {
                 ((Projectile)c).spriteDirection = spriteDirection;
                 ((Projectile)c).rotation = rotation;
             }
@@ -153,38 +140,26 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
          * rotAddon : the amount to add to the rotation. (only used by lookType 3/4)
          * rotAmount: the amount to rotate by. (only used by lookType 3/4)
          */
-        public static void LookAt(Vector2 lookTarget, Vector2 center, ref float rotation, ref int spriteDirection, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.075f, bool flipSpriteDir = false)
-        {
-            if (lookType == 0)
-            {
+        public static void LookAt(Vector2 lookTarget, Vector2 center, ref float rotation, ref int spriteDirection, int lookType = 0, float rotAddon = 0f, float rotAmount = 0.075f, bool flipSpriteDir = false) {
+            if (lookType == 0) {
                 if (lookTarget.X > center.X) { spriteDirection = -1; } else { spriteDirection = 1; }
                 if (flipSpriteDir) { spriteDirection *= -1; }
                 float rotX = lookTarget.X - center.X;
                 float rotY = lookTarget.Y - center.Y;
                 rotation = -((float)Math.Atan2((double)rotX, (double)rotY) - 1.57f + rotAddon);
                 if (spriteDirection == 1) { rotation -= (float)Math.PI; }
-            }
-            else
-            if (lookType == 1)
-            {
+            } else if (lookType == 1) {
                 if (lookTarget.X > center.X) { spriteDirection = -1; } else { spriteDirection = 1; }
                 if (flipSpriteDir) { spriteDirection *= -1; }
-            }
-            else
-            if (lookType == 2)
-            {
+            } else if (lookType == 2) {
                 float rotX = lookTarget.X - center.X;
                 float rotY = lookTarget.Y - center.Y;
                 rotation = -((float)Math.Atan2((double)rotX, (double)rotY) - 1.57f + rotAddon);
-            }
-            else
-            if (lookType == 3 || lookType == 4)
-            {
+            } else if (lookType == 3 || lookType == 4) {
                 int oldDirection = spriteDirection;
                 if (lookType == 3 && lookTarget.X > center.X) { spriteDirection = -1; } else { spriteDirection = 1; }
                 if (lookType == 3 && flipSpriteDir) { spriteDirection *= -1; }
-                if (oldDirection != spriteDirection)
-                {
+                if (oldDirection != spriteDirection) {
                     rotation += (float)Math.PI * spriteDirection;
                 }
                 float pi2 = (float)Math.PI * 2f;
@@ -194,19 +169,13 @@ namespace Macrocosm.Content.NPCs.Unfriendly.Enemies
                 if (spriteDirection == 1) { rot += (float)Math.PI; }
                 if (rot > pi2) { rot -= pi2; } else if (rot < 0) { rot += pi2; }
                 if (rotation > pi2) { rotation -= pi2; } else if (rotation < 0) { rotation += pi2; }
-                if (rotation < rot)
-                {
+                if (rotation < rot) {
                     if ((double)(rot - rotation) > (float)Math.PI) { rotation -= rotAmount; } else { rotation += rotAmount; }
-                }
-                else
-                if (rotation > rot)
-                {
+                } else if (rotation > rot) {
                     if ((double)(rotation - rot) > (float)Math.PI) { rotation += rotAmount; } else { rotation -= rotAmount; }
                 }
                 if (rotation > rot - rotAmount && rotation < rot + rotAmount) { rotation = rot; }
             }
         }
-
-
     }
 }

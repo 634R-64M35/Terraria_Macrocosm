@@ -3,12 +3,9 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Macrocosm.Content.Items.Tools
-{
-	public class SeleniteWarhammer : ModItem
-	{
-		public override void SetStaticDefaults()
-		{
+namespace Macrocosm.Content.Items.Tools {
+	public class SeleniteWarhammer : ModItem {
+		public override void SetStaticDefaults() {
 			
 		}
 
@@ -30,13 +27,12 @@ namespace Macrocosm.Content.Items.Tools
 			Item.tileBoost = 5;
 		}
 
-		public override void AddRecipes()
-		{
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient<LuminiteCrystal>();
-			recipe.AddIngredient<SeleniteBar>(12);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<LuminiteCrystal>()
+				.AddIngredient<SeleniteBar>(12)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 	}
 }

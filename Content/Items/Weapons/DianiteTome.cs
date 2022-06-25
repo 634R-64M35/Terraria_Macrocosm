@@ -6,17 +6,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Macrocosm.Content.Items.Materials;
 
-namespace Macrocosm.Content.Items.Weapons
-{
-	public class DianiteTome : ModItem
-	{
-		public override void SetStaticDefaults()
-		{
+namespace Macrocosm.Content.Items.Weapons {
+	public class DianiteTome : ModItem {
+		public override void SetStaticDefaults() {
 			
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			Item.damage = 150;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 30;
@@ -36,20 +32,17 @@ namespace Macrocosm.Content.Items.Weapons
 			Item.tileBoost = 50;
 		}
 
-		public override void AddRecipes()
-		{
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient<LuminiteCrystal>();
-			recipe.AddIngredient<DianiteBar>(12);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<LuminiteCrystal>()
+				.AddIngredient<DianiteBar>(12)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 
-		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockBack)
-		{
+		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockBack) {
 			int numberProjectiles = 6 + Main.rand.Next(2);  //This defines how many projectiles to shot
-			for (int index = 0; index < numberProjectiles; ++index)
-			{
+			for (int index = 0; index < numberProjectiles; ++index) {
 				Vector2 vector2_1 = new Vector2((float)((double)player.position.X + (double)player.width * 0.5 + (double)(Main.rand.Next(201) * -player.direction) + ((double)Main.mouseX + (double)Main.screenPosition.X - (double)player.position.X)), (float)((double)player.position.Y + (double)player.height * 0.5 - 600.0));   //this defines the Projectile width, direction and position
 				vector2_1.X = (float)(((double)vector2_1.X + (double)player.Center.X) / 2.0) + (float)Main.rand.Next(-200, 201);
 				vector2_1.Y -= (float)(100 * index);

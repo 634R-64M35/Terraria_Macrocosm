@@ -28,13 +28,13 @@ namespace Macrocosm.Content.Projectiles.Unfriendly {
 
 		public override void AI() {
 			Projectile.velocity.Y += 0.068f;
-			if(Projectile.velocity.Y > 16f)
+			if (Projectile.velocity.Y > 16f)
 				Projectile.velocity.Y = 16f;
 
-			if(Projectile.velocity != Vector2.Zero)
+			if (Projectile.velocity != Vector2.Zero)
 				Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.Pi;
 
-			if(Main.rand.NextFloat() < 0.3f) {
+			if (Main.rand.NextFloat() < 0.3f) {
 				Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.FlameBurst);
 				dust.velocity = new Vector2(0f, Main.rand.NextFloat(0.2f, 1.5f));
 			}

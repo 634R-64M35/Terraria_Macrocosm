@@ -10,7 +10,9 @@ namespace Macrocosm.Common.Utility {
 
             return input[rand];
         }
+
         private static List<int> chosenTs = new List<int>();
+
         public static List<T> PickRandom<T>(this T[] input, int amount) {
             List<T> values = new List<T>();
             for (int i = 0; i < amount; i++) {

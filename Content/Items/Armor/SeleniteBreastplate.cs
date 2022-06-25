@@ -1,16 +1,12 @@
-// using Macrocosm.Tiles;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Macrocosm.Content.Items.Materials;
 
-namespace Macrocosm.Content.Items.Armor
-{
+namespace Macrocosm.Content.Items.Armor {
 	[AutoloadEquip(EquipType.Body)]
-	public class SeleniteBreastplate : ModItem
-	{
-		public override void SetStaticDefaults() 
-		{
+	public class SeleniteBreastplate : ModItem {
+		public override void SetStaticDefaults()  {
 		}
 
 		public override void SetDefaults() {
@@ -22,10 +18,10 @@ namespace Macrocosm.Content.Items.Armor
 		}
 
 		public override void AddRecipes() {
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient(ModContent.ItemType<SeleniteBar>(), 16);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+			CreateRecipe()
+				.AddIngredient(ModContent.ItemType<SeleniteBar>(), 16)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 	}
 }

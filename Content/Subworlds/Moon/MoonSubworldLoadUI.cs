@@ -7,8 +7,7 @@ using Terraria.UI.Chat;
 using Macrocosm.Common.Utility;
 using Macrocosm.Common.Utility.IO;
 
-namespace Macrocosm.Content.Subworlds.Moon
-{
+namespace Macrocosm.Content.Subworlds.Moon {
     /*
     public class MoonSubworldLoadUI : UIDefaultSubworldLoad
     {

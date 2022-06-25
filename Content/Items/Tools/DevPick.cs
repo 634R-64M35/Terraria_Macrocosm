@@ -2,17 +2,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Macrocosm.Content.Items.Tools
-{
-	public class DevPick : ModItem
-	{
-		public override void SetStaticDefaults()
-		{
+namespace Macrocosm.Content.Items.Tools {
+	public class DevPick : ModItem {
+		public override void SetStaticDefaults() {
 			Tooltip.SetDefault("Dev Pickaxe.");
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			Item.damage = 10000;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;

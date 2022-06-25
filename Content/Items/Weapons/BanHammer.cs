@@ -2,17 +2,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Macrocosm.Content.Items.Weapons
-{
-	public class BanHammer : ModItem
-	{
-		public override void SetStaticDefaults()
-		{
+namespace Macrocosm.Content.Items.Weapons {
+	public class BanHammer : ModItem {
+		public override void SetStaticDefaults() {
 			Tooltip.SetDefault("BEGONE.");
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			Item.damage = 100000000;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;
@@ -27,8 +23,7 @@ namespace Macrocosm.Content.Items.Weapons
 			Item.autoReuse = false;
 		}
 
-		public override void AddRecipes()
-		{
+		public override void AddRecipes() {
 
 		}
 	}

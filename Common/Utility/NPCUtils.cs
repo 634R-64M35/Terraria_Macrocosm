@@ -61,7 +61,7 @@ namespace Macrocosm.Common.Utility {
 			return npc != Main.npc.Length;	//Return false if we couldn't generate an NPC
 		}
 
-		public static void UpdateScaleAndHitbox(this NPC npc, int baseWidth, int baseHeight, float newScale){
+		public static void UpdateScaleAndHitbox(this NPC npc, int baseWidth, int baseHeight, float newScale) {
 			Vector2 center = npc.Center;
 			npc.width = (int)Math.Max(1f, baseWidth * newScale);
 			npc.height = (int)Math.Max(1f, baseHeight * newScale);

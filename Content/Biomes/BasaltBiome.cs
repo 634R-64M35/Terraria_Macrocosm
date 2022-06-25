@@ -7,10 +7,8 @@ using Terraria.UI;
 using Microsoft.Xna.Framework;
 using Macrocosm.Backgrounds;
 
-namespace Macrocosm.Content.Biomes
-{
-    public class BasaltBiome : MoonBiome
-    {
+namespace Macrocosm.Content.Biomes {
+    public class BasaltBiome : MoonBiome {
         // Inherited from the base MoonBiome
         
         // public override SceneEffectPriority Priority => SceneEffectPriority.BiomeHigh;
@@ -21,19 +19,16 @@ namespace Macrocosm.Content.Biomes
 
         //public override int Music => base.Music;
 
-        public override void SetStaticDefaults()
-        {
+        public override void SetStaticDefaults() {
             DisplayName.SetDefault("Basalt");
         }
 
-        public override void OnInBiome(Player player)
-        {
+        public override void OnInBiome(Player player) {
             base.OnInBiome(player);
             player.GetModPlayer<MacrocosmPlayer>().ZoneBasalt = true;
         }
 
-        public override bool IsBiomeActive(Player player)
-        {
+        public override bool IsBiomeActive(Player player) {
             return MacrocosmWorld.moonBiome > 20;
         }
     }

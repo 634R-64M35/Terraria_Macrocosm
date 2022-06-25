@@ -23,17 +23,16 @@ namespace Macrocosm.Content.Items.Materials
             // Set other Item.X values here
         }
 
-        public override void AddRecipes()
-        {
-            Recipe recipe = Mod.CreateRecipe(Type);
-            recipe.AddIngredient(ItemID.LunarBar, 5);
-            recipe.AddIngredient<SidusChunk>(10);
-            recipe.AddIngredient<NubisChunk>(10);
-            recipe.AddIngredient<CinisChunk>(10);
-            recipe.AddIngredient<TurbenChunk>(10);
-            recipe.AddIngredient<CosmicEssence>(3);
-            recipe.AddTile(TileID.WorkBenches);
-            recipe.Register();
+        public override void AddRecipes() {
+            CreateRecipe()
+                .AddIngredient(ItemID.LunarBar, 5)
+                .AddIngredient<SidusChunk>(10)
+                .AddIngredient<NubisChunk>(10)
+                .AddIngredient<CinisChunk>(10)
+                .AddIngredient<TurbenChunk>(10)
+                .AddIngredient<CosmicEssence>(3)
+                .AddTile(TileID.WorkBenches)
+                .Register();
         }
     }
 }

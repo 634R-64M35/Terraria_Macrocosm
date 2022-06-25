@@ -4,9 +4,9 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.GameContent;
 
-namespace Macrocosm.Common.Utility{
-	public static class PlayerUtils{
-		public static Rectangle GetSwungItemHitbox(this Player player){
+namespace Macrocosm.Common.Utility {
+	public static class PlayerUtils {
+		public static Rectangle GetSwungItemHitbox(this Player player) {
 			//Found in Player.cs
 			Item item = player.HeldItem;
 			bool flag21 = false;
@@ -23,7 +23,7 @@ namespace Macrocosm.Common.Utility{
 			if (player.gravDir == 1f)
 				hitbox.Y -= hitbox.Height;
 
-			if (item.useStyle == ItemUseStyleID.Swing){
+			if (item.useStyle == ItemUseStyleID.Swing) {
 				if (player.itemAnimation < player.itemAnimationMax * 0.333) {
 					if (player.direction == -1)
 						hitbox.X -= (int)(hitbox.Width * 1.4 - hitbox.Width);
@@ -43,7 +43,7 @@ namespace Macrocosm.Common.Utility{
 				if (player.itemAnimation > player.itemAnimationMax * 0.666) {
 					flag21 = true;
 				} else {
-					if(player.direction == -1)
+					if (player.direction == -1)
 						hitbox.X -= (int)(hitbox.Width * 1.4 - hitbox.Width);
 
 					hitbox.Width = (int)(hitbox.Width * 1.4);

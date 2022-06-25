@@ -21,16 +21,15 @@ namespace Macrocosm.Content.Items.Materials
             // Set other Item.X values here
         }
 
-        public override void AddRecipes()
-        {
-            Recipe recipe = Mod.CreateRecipe(Type);
-            recipe.AddIngredient(ItemID.FragmentSolar, 5);
-            recipe.AddIngredient(ItemID.FragmentVortex, 5);
-            recipe.AddIngredient(ItemID.FragmentNebula, 5);
-            recipe.AddIngredient(ItemID.FragmentStardust, 5);
-            recipe.AddIngredient<CosmicDust>(25);
-            recipe.AddTile(TileID.WorkBenches);
-            recipe.Register();
+        public override void AddRecipes() {
+            CreateRecipe()
+                .AddIngredient(ItemID.FragmentSolar, 5)
+                .AddIngredient(ItemID.FragmentVortex, 5)
+                .AddIngredient(ItemID.FragmentNebula, 5)
+                .AddIngredient(ItemID.FragmentStardust, 5)
+                .AddIngredient<CosmicDust>(25)
+                .AddTile(TileID.WorkBenches)
+                .Register();
         }
     }
 }

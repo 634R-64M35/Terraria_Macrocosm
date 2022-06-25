@@ -8,6 +8,7 @@ namespace Macrocosm.Common.Utility {
 			color.G += amount;
 			color.B += amount;
 		}
+
 		public static void ManipulateColor(ref Color color, float amount) {
 			color.R *= (byte)Math.Round(color.R * amount);
 			color.G += (byte)Math.Round(color.G * amount);

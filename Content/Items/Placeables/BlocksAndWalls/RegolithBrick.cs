@@ -3,12 +3,9 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
-namespace Macrocosm.Content.Items.Placeables.BlocksAndWalls
-{
-    public class RegolithBrick : ModItem
-    {
-        public override void SetStaticDefaults()
-        {
+namespace Macrocosm.Content.Items.Placeables.BlocksAndWalls {
+    public class RegolithBrick : ModItem {
+        public override void SetStaticDefaults() {
             
         }
 
@@ -28,12 +25,11 @@ namespace Macrocosm.Content.Items.Placeables.BlocksAndWalls
             Item.placeStyle = 0;
         }
 
-        public override void AddRecipes()
-        {
-            Recipe recipe = Mod.CreateRecipe(Type);
-            recipe.AddIngredient<Regolith>(2);
-            recipe.AddTile(TileID.WorkBenches);
-            recipe.Register();
+        public override void AddRecipes() {
+            CreateRecipe()
+                .AddIngredient<Regolith>(2)
+                .AddTile(TileID.WorkBenches)
+                .Register();
         }
     }
 }

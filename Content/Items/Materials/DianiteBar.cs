@@ -29,12 +29,11 @@ namespace Macrocosm.Content.Items.Materials
             // Set other Item.X values here
         }
 
-        public override void AddRecipes()
-        {
-            Recipe recipe = Mod.CreateRecipe(Type);
-            recipe.AddIngredient<DianiteOre>(6);
-            recipe.AddTile(TileID.WorkBenches);
-            recipe.Register();
+        public override void AddRecipes() {
+            CreateRecipe()
+                .AddIngredient<DianiteOre>(6)
+                .AddTile(TileID.WorkBenches)
+                .Register();
         }
     }
 }

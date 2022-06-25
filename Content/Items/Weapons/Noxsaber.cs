@@ -6,18 +6,14 @@ using Terraria.ModLoader;
 using Macrocosm.Content.Dusts;
 using Macrocosm.Common.Utility;
 
-namespace Macrocosm.Content.Items.Weapons
-{
-	public class Noxsaber : ModItem
-	{
-		public override void SetStaticDefaults() 
-		{
+namespace Macrocosm.Content.Items.Weapons {
+	public class Noxsaber : ModItem {
+		public override void SetStaticDefaults()  {
 			DisplayName.SetDefault("The Noxsaber"); // By default, capitalization in classnames will add spaces to the display name. You can customize the display name here by uncommenting this line.
 			Tooltip.SetDefault("An ancient black energy saber, stolen from the temple of a long dead cult");
 		}
         
-        public override void SetDefaults() 
-		{
+        public override void SetDefaults()  {
 			Item.damage = 777;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 100;
@@ -33,25 +29,23 @@ namespace Macrocosm.Content.Items.Weapons
 			Item.GetGlobalItem<GlowmaskGlobalItem>().glowTexture = ModContent.Request<Texture2D>("Macrocosm/Content/Items/Weapons/Noxsaber_Glow").Value;
 		}
         
-		public override void MeleeEffects(Player player, Rectangle hitbox)
-		{
+		public override void MeleeEffects(Player player, Rectangle hitbox) {
 			//if (Main.rand.NextBool(2))
 			//{
 			//	int dust = Dust.NewDust(new Vector2(hitbox.X, hitbox.Y), hitbox.Width, hitbox.Height, ModContent.DustType<CrucibleDust>());
 			//}
 		}
-		public override void PostUpdate()
-		{
+
+		public override void PostUpdate() {
 			Lighting.AddLight(Item.Center, Color.White.ToVector3() * 0.85f * Main.essScale);
 		}
 
-		public override void AddRecipes() 
-		{
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient(ItemID.HellstoneBar, 20);
-			recipe.AddIngredient(ItemID.SoulofFright, 10);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient(ItemID.HellstoneBar, 20)
+				.AddIngredient(ItemID.SoulofFright, 10)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 	}
 }

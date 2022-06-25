@@ -1,13 +1,11 @@
-// using Macrocosm.Tiles;
+// using Macrocosm.Tiles; What (what) ¿
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 
-namespace Macrocosm.Content.Items.Armor
-{
+namespace Macrocosm.Content.Items.Armor {
 	[AutoloadEquip(EquipType.Legs)]
-	public class AstronautLeggings : ModItem
-	{
+	public class AstronautLeggings : ModItem {
 		public override void SetStaticDefaults() {
 		}
 
@@ -24,10 +22,10 @@ namespace Macrocosm.Content.Items.Armor
 		}
 
 		public override void AddRecipes() {
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient(ItemID.DirtBlock, 10);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+			CreateRecipe()
+				.AddIngredient(ItemID.DirtBlock, 10)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 	}
 }

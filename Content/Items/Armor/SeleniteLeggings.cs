@@ -3,11 +3,9 @@ using Terraria.ModLoader;
 using Terraria.ID;
 using Macrocosm.Content.Items.Materials;
 
-namespace Macrocosm.Content.Items.Armor
-{
+namespace Macrocosm.Content.Items.Armor {
 	[AutoloadEquip(EquipType.Legs)]
-	public class SeleniteLeggings : ModItem
-	{
+	public class SeleniteLeggings : ModItem {
 		public override void SetStaticDefaults() {
 		}
 
@@ -24,10 +22,10 @@ namespace Macrocosm.Content.Items.Armor
 		}
 
 		public override void AddRecipes() {
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient(ModContent.ItemType<SeleniteBar>(), 12);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+			CreateRecipe()
+				.AddIngredient(ModContent.ItemType<SeleniteBar>(), 12)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 	}
 }

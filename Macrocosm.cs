@@ -21,15 +21,12 @@ namespace Macrocosm {
             if (!Main.dedServ)
                 LoadMoonSky();
             
-            try
-            {
+            try {
                 var ta = ModLoader.GetMod("TerrariaAmbience");
                 var taAPI = ModLoader.GetMod("TerrariaAmbienceAPI");
                 ta?.Call("AddTilesToList", this, "Stone", new string[] { "Regolith", "RegolithBrick", "Hemostone" }, null); // ech
                 taAPI?.Call(this, "Sounds/Ambient/Moon", "MoonAmbience", 1f, 0.0075f, new Func<bool>(SubworldSystem.IsActive<Moon>));
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Logger.Warn(e.Message + " Failed to load TerrariaAmbience. ");
             }
 

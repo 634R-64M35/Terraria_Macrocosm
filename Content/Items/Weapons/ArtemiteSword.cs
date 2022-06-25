@@ -3,17 +3,12 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Macrocosm.Content.Items.Weapons
-{
-	public class ArtemiteSword : ModItem
-	{
-		public override void SetStaticDefaults()
-		{
-			
+namespace Macrocosm.Content.Items.Weapons {
+	public class ArtemiteSword : ModItem {
+		public override void SetStaticDefaults() {
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			Item.damage = 225;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 40;
@@ -30,13 +25,12 @@ namespace Macrocosm.Content.Items.Weapons
 			Item.shootSpeed = 10f;
 		}
 
-		public override void AddRecipes()
-		{
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient<LuminiteCrystal>();
-			recipe.AddIngredient<ArtemiteBar>(12);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<LuminiteCrystal>()
+				.AddIngredient<ArtemiteBar>(12)
+				.AddTile(TileID.WorkBenches)
+				.Register();
 		}
 	}
 }

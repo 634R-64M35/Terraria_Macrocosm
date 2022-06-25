@@ -3,17 +3,13 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Macrocosm.Content.Items.Tools
-{
-	public class DianiteWaraxe : ModItem
-	{
-		public override void SetStaticDefaults()
-		{
+namespace Macrocosm.Content.Items.Tools {
+	public class DianiteWaraxe : ModItem {
+		public override void SetStaticDefaults() {
 			
 		}
 
-		public override void SetDefaults()
-		{
+		public override void SetDefaults() {
 			Item.damage = 70;
 			Item.DamageType = DamageClass.Melee;
 			Item.width = 42;
@@ -30,13 +26,12 @@ namespace Macrocosm.Content.Items.Tools
 			Item.tileBoost = 5;
 		}
 
-		public override void AddRecipes()
-		{
-			Recipe recipe = Mod.CreateRecipe(Type);
-			recipe.AddIngredient<LuminiteCrystal>();
-			recipe.AddIngredient<DianiteBar>(12);
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.Register();
+		public override void AddRecipes() {
+			CreateRecipe()
+			.AddIngredient<LuminiteCrystal>()
+			.AddIngredient<DianiteBar>(12)
+			.AddTile(TileID.WorkBenches)
+			.Register();
 		}
 	}
 }
